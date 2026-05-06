@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Player } from "@/components/Player";
-import { PlayerMobile } from "@/components/PlayerMobile";
+import { PlayerShell } from "@/components/PlayerShell";
 import { streamSource } from "@/lib/stream-source";
 import { getCoverArt } from "@/lib/itunes";
 import { getServerEnv } from "@/lib/env.server";
@@ -22,19 +21,18 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const current = streamSource.getCurrent();
   const cover = current
-    ? await getCoverArt({ artist: current.artist, song: current.song })
+    ? await getCoverArt({
+        artist: current.artist,
+        song: current.song,
+        cacheTtlS: getServerEnv().ITUNES_CACHE_TTL_S
+      })
     : null;
 
   return (
     <>
       <Header />
       <main className="mx-auto max-w-5xl px-4 py-8">
-        <Player
-          streamUrl={getServerEnv().STREAM_URL}
-          defaultCoverUrl={clientEnv.NEXT_PUBLIC_DEFAULT_COVER}
-          cover={cover}
-        />
-        <PlayerMobile
+        <PlayerShell
           streamUrl={getServerEnv().STREAM_URL}
           defaultCoverUrl={clientEnv.NEXT_PUBLIC_DEFAULT_COVER}
           cover={cover}

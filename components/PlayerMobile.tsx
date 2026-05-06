@@ -1,46 +1,34 @@
 "use client";
 
-import { useCallback } from "react";
-import { useAudioPlayer } from "@/hooks/useAudioPlayer";
-import { useNowPlaying } from "@/hooks/useNowPlaying";
-import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
-import { useMediaSession } from "@/hooks/useMediaSession";
 import { PlayButton } from "@/components/PlayButton";
 import { VolumeControl } from "@/components/VolumeControl";
 import { NowPlaying } from "@/components/NowPlaying";
 import { CoverArt } from "@/components/CoverArt";
-import type { CoverArt as CoverArtType } from "@/lib/types";
+import type { NowPlaying as NowPlayingType, CoverArt as CoverArtType } from "@/lib/types";
 
 interface Props {
-  streamUrl: string;
-  defaultCoverUrl: string;
+  nowPlaying: NowPlayingType | null;
   cover: CoverArtType | null;
+  defaultCoverUrl: string;
+  volume: number;
+  muted: boolean;
+  isPlaying: boolean;
+  onToggle: () => void;
+  onSetVolume: (value: number) => void;
+  onToggleMute: () => void;
 }
 
-export function PlayerMobile({ streamUrl, defaultCoverUrl, cover }: Props) {
-  const player = useAudioPlayer(streamUrl);
-  const { data: nowPlaying } = useNowPlaying();
-
-  useKeyboardShortcuts({
-    togglePlay: useCallback(() => void player.toggle(), [player]),
-    toggleMute: player.toggleMute,
-    setVolume: player.setVolume,
-    volumeUp: useCallback(() => player.setVolume(Math.min(100, player.volume + 5)), [player]),
-    volumeDown: useCallback(() => player.setVolume(Math.max(0, player.volume - 5)), [player])
-  });
-
-  useMediaSession(
-    nowPlaying
-      ? {
-          song: nowPlaying.song,
-          artist: nowPlaying.artist,
-          cover,
-          onPlay: () => void player.play(),
-          onPause: () => player.pause()
-        }
-      : null
-  );
-
+export function PlayerMobile({
+  nowPlaying,
+  cover,
+  defaultCoverUrl,
+  volume,
+  muted,
+  isPlaying,
+  onToggle,
+  onSetVolume,
+  onToggleMute
+}: Props) {
   return (
     <section className="bg-[url('/img/radio_ancienne_gsm.jpg')] bg-cover bg-top p-4 lg:hidden">
       <div className="mx-auto grid max-w-md gap-4">
@@ -48,12 +36,12 @@ export function PlayerMobile({ streamUrl, defaultCoverUrl, cover }: Props) {
         <NowPlaying song={nowPlaying?.song ?? "..."} artist={nowPlaying?.artist ?? "..."} />
         <div className="flex items-center justify-between">
           <VolumeControl
-            volume={player.volume}
-            muted={player.muted}
-            onChange={player.setVolume}
-            onToggleMute={player.toggleMute}
+            volume={volume}
+            muted={muted}
+            onChange={onSetVolume}
+            onToggleMute={onToggleMute}
           />
-          <PlayButton isPlaying={player.isPlaying} onToggle={() => void player.toggle()} />
+          <PlayButton isPlaying={isPlaying} onToggle={onToggle} />
         </div>
       </div>
     </section>

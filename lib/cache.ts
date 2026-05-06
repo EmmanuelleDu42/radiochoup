@@ -1,8 +1,11 @@
+import { globalSingleton } from "./global-singleton";
+
 interface Entry<T> {
   value: T;
   expiresAt: number;
 }
 
+// Exported for testing only; production code should use the `cache` singleton.
 export class MemoryCache {
   private store = new Map<string, Entry<unknown>>();
 
@@ -33,10 +36,4 @@ export class MemoryCache {
   }
 }
 
-// Single instance per Node process. In dev, attached to globalThis to survive HMR module reloads.
-const globalForCache = globalThis as unknown as { __memoryCache?: MemoryCache };
-
-export const cache = globalForCache.__memoryCache ?? new MemoryCache();
-if (process.env.NODE_ENV !== "production") {
-  globalForCache.__memoryCache = cache;
-}
+export const cache = globalSingleton("__memoryCache", () => new MemoryCache());

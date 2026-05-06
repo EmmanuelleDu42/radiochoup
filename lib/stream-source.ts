@@ -3,6 +3,7 @@ import { getServerEnv } from "@/lib/env.server";
 import { fetchIcecastStatus } from "@/lib/icecast";
 import { fetchShoutcastStatus } from "@/lib/shoutcast";
 import { historyStore } from "@/lib/history-store";
+import { globalSingleton } from "@/lib/global-singleton";
 import type { NowPlaying } from "@/lib/types";
 
 type Subscriber = (data: NowPlaying) => void;
@@ -68,10 +69,5 @@ class StreamSource {
   }
 }
 
-const globalForStream = globalThis as unknown as { __streamSource?: StreamSource };
-// Single instance per Node process. In dev, attached to globalThis to survive HMR module reloads.
-export const streamSource = globalForStream.__streamSource ?? new StreamSource();
-if (process.env.NODE_ENV !== "production") {
-  globalForStream.__streamSource = streamSource;
-}
+export const streamSource = globalSingleton("__streamSource", () => new StreamSource());
 streamSource.start();

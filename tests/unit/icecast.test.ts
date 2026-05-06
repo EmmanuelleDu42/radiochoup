@@ -80,6 +80,21 @@ describe("parseIcecastStatus", () => {
     expect(result?.listeners).toBe(0);
     expect(result?.bitrate).toBe(0);
   });
+
+  it("decodes HTML entities in Icecast title", () => {
+    const result = parseIcecastStatus({
+      icestats: {
+        source: {
+          title: "Beyonc&eacute; - Halo",
+          listeners: 1,
+          bitrate: 128,
+          listener_peak: 1
+        }
+      }
+    });
+    expect(result?.artist).toBe("Beyoncé");
+    expect(result?.song).toBe("Halo");
+  });
 });
 
 describe("fetchIcecastStatus", () => {
@@ -101,5 +116,11 @@ describe("fetchIcecastStatus", () => {
     const result = await fetchIcecastStatus("https://x/status-json.xsl");
     expect(result?.artist).toBe("A");
     expect(result?.song).toBe("B");
+  });
+
+  it("returns null on network error", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network")));
+    const result = await fetchIcecastStatus("https://x/status-json.xsl");
+    expect(result).toBeNull();
   });
 });

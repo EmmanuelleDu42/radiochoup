@@ -1,0 +1,1 @@
+The project utilizes Next.js 15, React 19, TypeScript, and Tailwind v4 for its core development stack.

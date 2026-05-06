@@ -1,0 +1,1 @@
+Icecast parsing requires explicit fallbacks for empty songRaw fields to ensure consistent artist and song metadata mapping.

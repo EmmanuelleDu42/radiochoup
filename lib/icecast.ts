@@ -1,4 +1,5 @@
-import { splitTitle } from "./parse-title";
+import { splitTitle, decodeHtmlEntities } from "./parse-title";
+import { EXTERNAL_FETCH_TIMEOUT_MS } from "./constants";
 
 interface IcecastSource {
   title: string;
@@ -30,11 +31,12 @@ export function parseIcecastStatus(raw: unknown): ParsedNowPlaying | null {
   const listeners = typeof source.listeners === "number" ? source.listeners : 0;
   const bitrate = typeof source.bitrate === "number" ? source.bitrate : 0;
 
-  const [artistRaw, songRaw] = splitTitle(source.title);
+  const decoded = decodeHtmlEntities(source.title);
+  const [artistRaw, songRaw] = splitTitle(decoded);
   if (songRaw === "") {
     return {
       artist: "",
-      song: source.title.trim(),
+      song: decoded.trim(),
       listeners,
       bitrate
     };
@@ -55,11 +57,16 @@ function isIcecastStatus(value: unknown): value is IcecastStatus {
 }
 
 export async function fetchIcecastStatus(statusUrl: string): Promise<ParsedNowPlaying | null> {
-  const response = await fetch(statusUrl, {
-    cache: "no-store",
-    signal: AbortSignal.timeout(5000)
-  });
-  if (!response.ok) return null;
-  const data = await response.json();
-  return parseIcecastStatus(data);
+  try {
+    const response = await fetch(statusUrl, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(EXTERNAL_FETCH_TIMEOUT_MS)
+    });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return parseIcecastStatus(data);
+  } catch {
+    // Silent fail by design: external API errors should not crash the poll loop.
+    return null;
+  }
 }

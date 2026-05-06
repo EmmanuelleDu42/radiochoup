@@ -1,4 +1,5 @@
 import type { HistoryEntry } from "@/lib/types";
+import { globalSingleton } from "./global-singleton";
 
 export class HistoryStore {
   private buffer: HistoryEntry[] = [];
@@ -27,11 +28,4 @@ export class HistoryStore {
   }
 }
 
-// Single instance per Node process. In dev, attached to globalThis to survive HMR module reloads.
-const globalForHistory = globalThis as unknown as { __historyStore?: HistoryStore };
-
-export const historyStore =
-  globalForHistory.__historyStore ?? new HistoryStore(20);
-if (process.env.NODE_ENV !== "production") {
-  globalForHistory.__historyStore = historyStore;
-}
+export const historyStore = globalSingleton("__historyStore", () => new HistoryStore(20));

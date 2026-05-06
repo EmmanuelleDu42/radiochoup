@@ -1,0 +1,1 @@
+Server-side caching uses a Map-based store with expiration timestamps implemented as a global singleton to survive HMR.

@@ -1,0 +1,1 @@
+Environment variables are separated into server and client files to ensure security and prevent sensitive data leakage.
