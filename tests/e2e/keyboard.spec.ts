@@ -6,6 +6,7 @@ test.describe("keyboard shortcuts", () => {
     await page.goto("/");
     const volume = page.getByRole("slider", { name: /Volume/i }).first();
     await volume.fill("60");
+    await volume.blur();
     await page.keyboard.press("KeyM");
     await expect(volume).toHaveValue("0");
     await page.keyboard.press("KeyM");

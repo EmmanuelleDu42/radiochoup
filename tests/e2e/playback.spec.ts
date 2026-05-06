@@ -4,7 +4,7 @@ import { test, expect } from "@playwright/test";
 test.describe("playback", () => {
   test("la home charge avec le bouton lecture visible", async ({ page }) => {
     await page.goto("/");
-    const playButton = page.getByRole("button", { name: /Lire|Mettre en pause/ });
+    const playButton = page.getByRole("button", { name: /Lire|Mettre en pause/ }).first();
     await expect(playButton).toBeVisible();
   });
 
