@@ -27,10 +27,12 @@ class StreamSource {
   }
 
   getCurrent(): NowPlaying | null {
+    this.start();
     return this.current;
   }
 
   subscribe(fn: Subscriber): () => void {
+    this.start();
     this.subscribers.add(fn);
     if (this.current) fn(this.current);
     return () => {
@@ -70,4 +72,3 @@ class StreamSource {
 }
 
 export const streamSource = globalSingleton("__streamSource", () => new StreamSource());
-streamSource.start();

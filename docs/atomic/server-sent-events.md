@@ -4,8 +4,7 @@ slug: server-sent-events
 status: implemented
 files:
   - app/api/stream-events/route.ts
-  - hooks/useNowPlaying.ts
-  - hooks/useHistory.ts
+  - hooks/useStreamEvents.ts
 updated: 2026-05-06
 ---
 

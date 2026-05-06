@@ -35,7 +35,7 @@ export default async function HomePage() {
         <PlayerShell
           streamUrl={getServerEnv().STREAM_URL}
           defaultCoverUrl={clientEnv.NEXT_PUBLIC_DEFAULT_COVER}
-          cover={cover}
+          initialCover={cover}
         />
       </main>
       <Footer />

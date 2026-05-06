@@ -87,14 +87,16 @@ export function useAudioPlayer(streamUrl: string): UseAudioPlayerResult {
   const toggleMute = useCallback(() => {
     if (!audioRef.current) return;
     if (muted) {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      const restored = stored ? Number(stored) || 80 : 80;
-      setVolume(restored);
+      // Unmute: restore DOM audio state and React muted flag unconditionally.
+      // We cannot rely on setVolume() to clear the muted flag because setVolume()
+      // has an early-return guard when the volume value hasn't changed.
+      audioRef.current.muted = false;
+      setMuted(false);
     } else {
       audioRef.current.muted = true;
       setMuted(true);
     }
-  }, [muted, setVolume]);
+  }, [muted]);
 
   return { isPlaying, volume, muted, play, pause, toggle, setVolume, toggleMute };
 }

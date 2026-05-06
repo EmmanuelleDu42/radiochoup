@@ -5,33 +5,49 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export function GET() {
+  let unsubscribe: (() => void) | null = null;
+  let heartbeat: NodeJS.Timeout | null = null;
+
   const stream = new ReadableStream({
     start(controller) {
       const encoder = new TextEncoder();
 
       const send = (event: string, data: unknown) => {
-        controller.enqueue(
-          encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
-        );
+        try {
+          controller.enqueue(
+            encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+          );
+        } catch {
+          // controller closed — ignore
+        }
       };
 
       const current = streamSource.getCurrent();
       if (current) send("now-playing", current);
       send("history-updated", historyStore.list().slice(0, 5));
 
-      const unsubscribe = streamSource.subscribe((data) => {
+      unsubscribe = streamSource.subscribe((data) => {
         send("now-playing", data);
         send("history-updated", historyStore.list().slice(0, 5));
       });
 
-      const heartbeat = setInterval(() => {
-        controller.enqueue(encoder.encode(": heartbeat\n\n"));
+      heartbeat = setInterval(() => {
+        try {
+          controller.enqueue(encoder.encode(": heartbeat\n\n"));
+        } catch {
+          // ignore
+        }
       }, 25000);
-
-      return () => {
+    },
+    cancel() {
+      if (unsubscribe) {
         unsubscribe();
+        unsubscribe = null;
+      }
+      if (heartbeat) {
         clearInterval(heartbeat);
-      };
+        heartbeat = null;
+      }
     }
   });
 

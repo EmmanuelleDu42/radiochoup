@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { useStreamEvents } from "@/hooks/useStreamEvents";
+import { useCover } from "@/hooks/useCover";
 import { useLyrics } from "@/hooks/useLyrics";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useMediaSession } from "@/hooks/useMediaSession";
@@ -16,12 +17,13 @@ import type { CoverArt } from "@/lib/types";
 interface Props {
   streamUrl: string;
   defaultCoverUrl: string;
-  cover: CoverArt | null;
+  initialCover: CoverArt | null;
 }
 
-export function PlayerShell({ streamUrl, defaultCoverUrl, cover }: Props) {
+export function PlayerShell({ streamUrl, defaultCoverUrl, initialCover }: Props) {
   const player = useAudioPlayer(streamUrl);
   const { nowPlaying, history } = useStreamEvents();
+  const cover = useCover(nowPlaying ? { artist: nowPlaying.artist, song: nowPlaying.song } : null, initialCover);
   const [openHistory, setOpenHistory] = useState(false);
   const [openLyrics, setOpenLyrics] = useState(false);
   const [openProgram, setOpenProgram] = useState(false);
@@ -33,11 +35,11 @@ export function PlayerShell({ streamUrl, defaultCoverUrl, cover }: Props) {
   const lyrics = useLyrics(lyricsParams);
 
   useKeyboardShortcuts({
-    togglePlay: useCallback(() => void player.toggle(), [player]),
+    togglePlay: () => void player.toggle(),
     toggleMute: player.toggleMute,
     setVolume: player.setVolume,
-    volumeUp: useCallback(() => player.setVolume(Math.min(100, player.volume + 5)), [player]),
-    volumeDown: useCallback(() => player.setVolume(Math.max(0, player.volume - 5)), [player])
+    volumeUp: () => player.setVolume(Math.min(100, player.volume + 5)),
+    volumeDown: () => player.setVolume(Math.max(0, player.volume - 5))
   });
 
   useMediaSession(

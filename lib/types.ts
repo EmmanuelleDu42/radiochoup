@@ -3,8 +3,8 @@ export type StreamType = "icecast" | "shoutcast";
 export interface NowPlaying {
   song: string;
   artist: string;
-  listeners: number | null;
-  bitrate: number | null;
+  listeners: number;
+  bitrate: number;
   fetchedAt: string; // ISO timestamp
 }
 
