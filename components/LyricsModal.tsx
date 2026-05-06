@@ -15,7 +15,7 @@ interface Props {
 export function LyricsModal({ open, onClose, song, artist, lyrics }: Props) {
   return (
     <AnimatePresence>
-      {open && (
+      {open ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -59,7 +59,7 @@ export function LyricsModal({ open, onClose, song, artist, lyrics }: Props) {
             </p>
           </motion.div>
         </motion.div>
-      )}
+      ) : null}
     </AnimatePresence>
   );
 }
