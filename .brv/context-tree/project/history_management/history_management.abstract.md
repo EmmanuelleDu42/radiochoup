@@ -1,1 +1,0 @@
-History management uses a Ring Buffer that only records new entries if they differ from the most recent entry to prevent duplicates.

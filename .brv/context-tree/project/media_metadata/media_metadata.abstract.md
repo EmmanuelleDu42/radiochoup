@@ -1,1 +1,0 @@
-Media metadata processing resizes iTunes artwork URLs by replacing the 100x100bb pattern with dimensions between 96 and 512 pixels.

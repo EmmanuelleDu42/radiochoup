@@ -1,1 +1,0 @@
-Playwright tests must use .first() selectors because desktop and mobile players render simultaneously and are toggled via CSS.

@@ -1,1 +1,0 @@
-RadioChoup modernizes a web-based radio player using Next.js 15 and Server-Sent Events to efficiently broadcast real-time stream metadata from Icecast sources.
