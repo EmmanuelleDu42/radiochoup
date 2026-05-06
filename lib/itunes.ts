@@ -1,14 +1,11 @@
+import { z } from "zod";
 import type { CoverArt } from "@/lib/types";
 import { clientEnv } from "@/lib/env.client";
 
-interface ItunesResult {
-  artworkUrl100: string;
-}
-
-interface ItunesResponse {
-  resultCount: number;
-  results: ItunesResult[];
-}
+const itunesResponseSchema = z.object({
+  resultCount: z.number(),
+  results: z.array(z.object({ artworkUrl100: z.string() }))
+});
 
 export async function searchItunesArtwork(params: {
   artist: string;
@@ -20,18 +17,22 @@ export async function searchItunesArtwork(params: {
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
     if (!response.ok) return null;
-    const data: ItunesResponse = await response.json();
-    if (data.resultCount === 0 || !data.results[0]) return null;
-    return data.results[0].artworkUrl100;
+    const raw = await response.json();
+    const parsed = itunesResponseSchema.safeParse(raw);
+    if (!parsed.success) return null;
+    if (parsed.data.resultCount === 0 || !parsed.data.results[0]) return null;
+    return parsed.data.results[0].artworkUrl100;
   } catch {
+    // Silent fail by design: external API errors should not crash the app, the UI displays defaults.
     return null;
   }
 }
 
 export function buildArtworkSizes(baseUrl: string): CoverArt["sizes"] {
-  const has100 = baseUrl.includes("100x100bb");
+  const itunesPattern = /(\d+)x\1bb/;
+  const match = itunesPattern.exec(baseUrl);
   const replace = (size: string) =>
-    has100 ? baseUrl.replace("100x100bb", `${size}x${size}bb`) : baseUrl;
+    match ? baseUrl.replace(itunesPattern, `${size}x${size}bb`) : baseUrl;
 
   return {
     s96: replace("96"),

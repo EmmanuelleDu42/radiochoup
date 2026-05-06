@@ -1,11 +1,12 @@
 import "server-only";
+import { z } from "zod";
 import { getServerEnv } from "@/lib/env.server";
 import type { Lyrics } from "@/lib/types";
 
-interface VagalumeResponse {
-  type: "exact" | "aprox" | "notfound" | "song_notfound";
-  mus?: Array<{ text: string }>;
-}
+const vagalumeResponseSchema = z.object({
+  type: z.enum(["exact", "aprox", "notfound", "song_notfound"]),
+  mus: z.array(z.object({ text: z.string() })).optional()
+});
 
 export async function fetchLyrics(params: {
   artist: string;
@@ -25,12 +26,15 @@ export async function fetchLyrics(params: {
       next: { revalidate: getServerEnv().LYRICS_CACHE_TTL_S }
     });
     if (!response.ok) return { text: null, source: null, available: false };
-    const data: VagalumeResponse = await response.json();
-    if ((data.type === "exact" || data.type === "aprox") && data.mus?.[0]?.text) {
-      return { text: data.mus[0].text, source: "vagalume", available: true };
+    const raw = await response.json();
+    const parsed = vagalumeResponseSchema.safeParse(raw);
+    if (!parsed.success) return { text: null, source: null, available: false };
+    if ((parsed.data.type === "exact" || parsed.data.type === "aprox") && parsed.data.mus?.[0]?.text) {
+      return { text: parsed.data.mus[0].text, source: "vagalume", available: true };
     }
     return { text: null, source: null, available: false };
   } catch {
+    // Silent fail by design: external API errors should not crash the app, the UI displays defaults.
     return { text: null, source: null, available: false };
   }
 }

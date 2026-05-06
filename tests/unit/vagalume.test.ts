@@ -11,7 +11,7 @@ describe("fetchLyrics", () => {
     vi.restoreAllMocks();
   });
 
-  it("retourne les paroles si type=exact", async () => {
+  it("returns lyrics when type=exact", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
@@ -25,7 +25,7 @@ describe("fetchLyrics", () => {
     expect(result.source).toBe("vagalume");
   });
 
-  it("retourne available=false si type=notfound", async () => {
+  it("returns available=false when type=notfound", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue({
@@ -38,7 +38,7 @@ describe("fetchLyrics", () => {
     expect(result.text).toBeNull();
   });
 
-  it("retourne available=false en erreur réseau", async () => {
+  it("returns available=false on network error", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockRejectedValue(new Error("network"))
@@ -47,7 +47,7 @@ describe("fetchLyrics", () => {
     expect(result.available).toBe(false);
   });
 
-  it("retourne available=false sur paramètres vides", async () => {
+  it("returns available=false on empty params", async () => {
     const result = await fetchLyrics({ artist: "", song: "" });
     expect(result.available).toBe(false);
   });
