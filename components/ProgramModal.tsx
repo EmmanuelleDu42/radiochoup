@@ -12,7 +12,7 @@ interface Props {
 export function ProgramModal({ open, onClose }: Props) {
   return (
     <AnimatePresence>
-      {open && (
+      {open ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -52,7 +52,7 @@ export function ProgramModal({ open, onClose }: Props) {
             />
           </motion.div>
         </motion.div>
-      )}
+      ) : null}
     </AnimatePresence>
   );
 }

@@ -13,7 +13,7 @@ interface Props {
 export function HistoryModal({ open, onClose, entries }: Props) {
   return (
     <AnimatePresence>
-      {open && (
+      {open ? (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -55,7 +55,7 @@ export function HistoryModal({ open, onClose, entries }: Props) {
             </ul>
           </motion.div>
         </motion.div>
-      )}
+      ) : null}
     </AnimatePresence>
   );
 }
