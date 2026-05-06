@@ -1,1 +1,0 @@
-Legacy technologies including jQuery, Bootstrap 4, PHP, and SWF files were removed during the final implementation phase.

@@ -1,1 +1,0 @@
-Shoutcast parsing extracts data by stripping HTML from the 7.html endpoint and processing the resulting CSV string.

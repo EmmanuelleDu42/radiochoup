@@ -1,1 +1,0 @@
-The application supports standalone deployment mode compatible with Node plus PM2 or Vercel environments.

@@ -1,1 +1,0 @@
-The system implements server-side polling of audio sources and delivers data to clients using Server-Sent Events.

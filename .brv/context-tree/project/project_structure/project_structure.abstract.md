@@ -1,1 +1,0 @@
-The application organizes code using a standard Next.js directory structure for routes, UI components, hooks, and utilities.
