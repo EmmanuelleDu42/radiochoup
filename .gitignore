@@ -5,3 +5,26 @@ node_modules/
 vendor/
 .DS_Store
 Thumbs.db
+
+# Next.js
+.next/
+out/
+node_modules/
+*.tsbuildinfo
+next-env.d.ts
+
+# pnpm
+.pnpm-store/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Tests
+playwright-report/
+test-results/
+coverage/
+
+# OS
+.DS_Store
