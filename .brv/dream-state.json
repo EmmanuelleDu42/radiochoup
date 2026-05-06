@@ -1,0 +1,66 @@
+{
+  "curationsSinceDream": 1,
+  "lastDreamAt": "2026-05-06T16:50:34.663Z",
+  "lastDreamLogId": "drm-1778086210146",
+  "pendingMerges": [],
+  "staleSummaryPaths": [
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/caching/caching.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/deployment/deployment.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/e2e_testing/e2e_testing.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/environment_variables/environment_variables.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/history_management/history_management.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/icecast_parsing/icecast_parsing.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/keyboard_shortcuts/keyboard_shortcuts.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/legacy_cleanup/legacy_cleanup.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/media_metadata/media_metadata.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/project_structure/project_structure.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/streaming/streaming.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/tech_stack/tech_stack.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/shoutcast_parsing/shoutcast_parsing.md"
+    },
+    {
+      "enqueuedAt": 1778089809296,
+      "path": "project/testing/testing.md"
+    }
+  ],
+  "totalDreams": 1,
+  "version": 1
+}

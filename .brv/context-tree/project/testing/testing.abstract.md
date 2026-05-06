@@ -1,0 +1,1 @@
+The project employs Vitest for unit testing and Playwright for end-to-end testing, utilizing stubs to handle server-only modules.

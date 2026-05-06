@@ -2,6 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { getServerEnv } from "@/lib/env.server";
 import type { Lyrics } from "@/lib/types";
+import { EXTERNAL_FETCH_TIMEOUT_MS } from "@/lib/constants";
 
 const vagalumeResponseSchema = z.object({
   type: z.enum(["exact", "aprox", "notfound", "song_notfound"]),
@@ -22,7 +23,7 @@ export async function fetchLyrics(params: {
 
   try {
     const response = await fetch(url.toString(), {
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(EXTERNAL_FETCH_TIMEOUT_MS),
       next: { revalidate: getServerEnv().LYRICS_CACHE_TTL_S }
     });
     if (!response.ok) return { text: null, source: null, available: false };

@@ -19,12 +19,14 @@ export function useAudioPlayer(streamUrl: string): UseAudioPlayerResult {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolumeState] = useState(80);
+  const volumeRef = useRef(80);
   const [muted, setMuted] = useState(false);
 
   useEffect(() => {
     const stored = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : null;
     const initial = stored ? Number(stored) : 80;
     setVolumeState(initial);
+    volumeRef.current = initial;
 
     const audio = new Audio(streamUrl);
     audio.volume = initial / 100;
@@ -69,6 +71,8 @@ export function useAudioPlayer(streamUrl: string): UseAudioPlayerResult {
 
   const setVolume = useCallback((value: number) => {
     const clamped = Math.max(0, Math.min(100, value));
+    if (clamped === volumeRef.current) return;
+    volumeRef.current = clamped;
     setVolumeState(clamped);
     if (audioRef.current) {
       audioRef.current.volume = clamped / 100;

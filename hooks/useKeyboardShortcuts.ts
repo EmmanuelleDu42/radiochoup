@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface Handlers {
   togglePlay: () => void;
@@ -11,6 +11,11 @@ interface Handlers {
 }
 
 export function useKeyboardShortcuts(handlers: Handlers): void {
+  const handlersRef = useRef(handlers);
+  useEffect(() => {
+    handlersRef.current = handlers;
+  });
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
@@ -18,34 +23,34 @@ export function useKeyboardShortcuts(handlers: Handlers): void {
 
       if (e.code === "Space" || e.code === "KeyP") {
         e.preventDefault();
-        handlers.togglePlay();
+        handlersRef.current.togglePlay();
         return;
       }
       if (e.code === "KeyM") {
         e.preventDefault();
-        handlers.toggleMute();
+        handlersRef.current.toggleMute();
         return;
       }
       if (e.code === "ArrowUp") {
         e.preventDefault();
-        handlers.volumeUp();
+        handlersRef.current.volumeUp();
         return;
       }
       if (e.code === "ArrowDown") {
         e.preventDefault();
-        handlers.volumeDown();
+        handlersRef.current.volumeDown();
         return;
       }
       if (e.code.startsWith("Digit") || e.code.startsWith("Numpad")) {
         const digit = Number(e.key);
         if (Number.isInteger(digit) && digit >= 0 && digit <= 9) {
           e.preventDefault();
-          handlers.setVolume(digit * 10);
+          handlersRef.current.setVolume(digit * 10);
         }
       }
     };
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [handlers]);
+  }, []);
 }

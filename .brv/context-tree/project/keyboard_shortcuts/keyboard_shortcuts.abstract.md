@@ -1,0 +1,1 @@
+The useKeyboardShortcuts hook ignores input and textarea targets to prevent interference with user typing.
