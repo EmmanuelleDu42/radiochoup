@@ -1,0 +1,15 @@
+# Restriction des adresses IP
+# Ordre de priorité des instructions : refuser puis autoriser
+#Order Deny,Allow
+
+# On n’autorise personne à accéder au site…
+#Deny from all
+
+# …Sauf l’adresse IP x.x.x.x
+#Allow from 109.12.224.155
+#Allow from 109.12.224.97
+#Allow from 78.116.243.168
+
+RewriteEngine on
+RewriteCond %{HTTPS} !=on
+RewriteRule .* https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
