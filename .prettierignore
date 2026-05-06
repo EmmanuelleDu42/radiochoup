@@ -1,0 +1,14 @@
+.next/
+node_modules/
+out/
+public/
+pnpm-lock.yaml
+*.php
+js/
+css/
+player2/
+config/
+.brv/
+fonts/
+img/
+docs/superpowers/
