@@ -1,26 +1,18 @@
+# Env
 .env
 .env.*
 !.env.example
-*.log
-node_modules/
-vendor/
-.DS_Store
-Thumbs.db
 
 # Next.js
 .next/
 out/
-node_modules/
 *.tsbuildinfo
 next-env.d.ts
 
-# pnpm
+# Dependencies
+node_modules/
+vendor/
 .pnpm-store/
-
-# Env
-.env
-.env.local
-.env.*.local
 
 # Tests
 playwright-report/
@@ -29,3 +21,5 @@ coverage/
 
 # OS
 .DS_Store
+Thumbs.db
+*.log
