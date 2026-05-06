@@ -5,6 +5,7 @@ export class HistoryStore {
 
   constructor(private readonly maxSize: number) {}
 
+  /** Returns true if the entry was new and added, false if it duplicated the latest. */
   push(entry: { artist: string; song: string }): boolean {
     const last = this.buffer[0];
     if (last && last.artist === entry.artist && last.song === entry.song) {
@@ -26,6 +27,7 @@ export class HistoryStore {
   }
 }
 
+// Single instance per Node process. In dev, attached to globalThis to survive HMR module reloads.
 const globalForHistory = globalThis as unknown as { __historyStore?: HistoryStore };
 
 export const historyStore =

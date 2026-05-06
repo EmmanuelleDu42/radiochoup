@@ -1,3 +1,5 @@
+import { splitTitle } from "./parse-title";
+
 export interface ShoutcastNowPlaying {
   streamingId: string;
   listenersMax: number;
@@ -8,12 +10,34 @@ export interface ShoutcastNowPlaying {
   artist: string;
 }
 
+function decodeHtmlEntities(s: string): string {
+  return s
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&eacute;/g, "é")
+    .replace(/&egrave;/g, "è")
+    .replace(/&ecirc;/g, "ê")
+    .replace(/&agrave;/g, "à")
+    .replace(/&acirc;/g, "â")
+    .replace(/&ucirc;/g, "û")
+    .replace(/&ccedil;/g, "ç")
+    .replace(/&ocirc;/g, "ô")
+    .replace(/&icirc;/g, "î")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+}
+
 export function parseShoutcast7HtmlBody(body: string): ShoutcastNowPlaying | null {
   if (!body) return null;
   const stripped = body.replace(/<\/?[a-z][^>]*>/gi, "").trim();
   if (!stripped) return null;
+  const decoded = decodeHtmlEntities(stripped);
 
-  const parts = stripped.split(",");
+  const parts = decoded.split(",");
   if (parts.length < 7) return null;
 
   const titleParts = parts.slice(6).join(",");
@@ -30,15 +54,10 @@ export function parseShoutcast7HtmlBody(body: string): ShoutcastNowPlaying | nul
   };
 }
 
-function splitTitle(title: string): [string, string] {
-  const idx = title.indexOf(" - ");
-  if (idx === -1) return [title, ""];
-  return [title.slice(0, idx), title.slice(idx + 3)];
-}
-
 export async function fetchShoutcastStatus(streamUrl: string): Promise<ShoutcastNowPlaying | null> {
   const response = await fetch(`${streamUrl}/7.html`, {
     cache: "no-store",
+    // Shoutcast servers commonly reject requests without a browser-like User-Agent (HTTP 403).
     headers: { "User-Agent": "Mozilla/5.0 RadioChoup/2.0" },
     signal: AbortSignal.timeout(5000)
   });

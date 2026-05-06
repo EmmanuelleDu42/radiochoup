@@ -1,3 +1,5 @@
+import { splitTitle } from "./parse-title";
+
 interface IcecastSource {
   title: string;
   listener_peak: number;
@@ -25,13 +27,16 @@ export function parseIcecastStatus(raw: unknown): ParsedNowPlaying | null {
   const source = Array.isArray(sourceRaw) ? sourceRaw[0] : sourceRaw;
   if (!source || typeof source.title !== "string") return null;
 
+  const listeners = typeof source.listeners === "number" ? source.listeners : 0;
+  const bitrate = typeof source.bitrate === "number" ? source.bitrate : 0;
+
   const [artistRaw, songRaw] = splitTitle(source.title);
   if (songRaw === "") {
     return {
       artist: "",
       song: source.title.trim(),
-      listeners: source.listeners,
-      bitrate: source.bitrate
+      listeners,
+      bitrate
     };
   }
   const artist = artistRaw.split(";")[0]?.trim() ?? "";
@@ -40,15 +45,9 @@ export function parseIcecastStatus(raw: unknown): ParsedNowPlaying | null {
   return {
     artist,
     song,
-    listeners: source.listeners,
-    bitrate: source.bitrate
+    listeners,
+    bitrate
   };
-}
-
-function splitTitle(title: string): [string, string] {
-  const idx = title.indexOf(" - ");
-  if (idx === -1) return [title, ""];
-  return [title.slice(0, idx), title.slice(idx + 3)];
 }
 
 function isIcecastStatus(value: unknown): value is IcecastStatus {

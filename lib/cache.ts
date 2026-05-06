@@ -33,6 +33,7 @@ export class MemoryCache {
   }
 }
 
+// Single instance per Node process. In dev, attached to globalThis to survive HMR module reloads.
 const globalForCache = globalThis as unknown as { __memoryCache?: MemoryCache };
 
 export const cache = globalForCache.__memoryCache ?? new MemoryCache();

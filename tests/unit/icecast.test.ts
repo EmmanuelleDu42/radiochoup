@@ -1,6 +1,6 @@
 // tests/unit/icecast.test.ts
-import { describe, it, expect } from "vitest";
-import { parseIcecastStatus } from "@/lib/icecast";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { parseIcecastStatus, fetchIcecastStatus } from "@/lib/icecast";
 
 const fixtureSingleSource = {
   icestats: {
@@ -29,7 +29,7 @@ const fixtureMultipleSources = {
 const fixtureEmpty = { icestats: {} };
 
 describe("parseIcecastStatus", () => {
-  it("parse une source unique", () => {
+  it("parses a single source", () => {
     const result = parseIcecastStatus(fixtureSingleSource);
     expect(result).toEqual({
       song: "Crazy",
@@ -39,17 +39,17 @@ describe("parseIcecastStatus", () => {
     });
   });
 
-  it("parse le premier élément si la source est un tableau", () => {
+  it("parses the first element when source is an array", () => {
     const result = parseIcecastStatus(fixtureMultipleSources);
     expect(result?.artist).toBe("Doris Day");
     expect(result?.song).toBe("Que sera, sera");
   });
 
-  it("retourne null si pas de source", () => {
+  it("returns null when no source", () => {
     expect(parseIcecastStatus(fixtureEmpty)).toBeNull();
   });
 
-  it("retourne le titre brut comme song si pas de séparateur", () => {
+  it("returns raw title as song when no separator", () => {
     const result = parseIcecastStatus({
       icestats: { source: { title: "MysteryTrack", listeners: 1, bitrate: 128, listener_peak: 5 } }
     });
@@ -57,7 +57,7 @@ describe("parseIcecastStatus", () => {
     expect(result?.artist).toBe("");
   });
 
-  it("ignore les point-virgules dans le nom d'artiste", () => {
+  it("ignores semicolons in artist name", () => {
     const result = parseIcecastStatus({
       icestats: {
         source: {
@@ -69,5 +69,37 @@ describe("parseIcecastStatus", () => {
       }
     });
     expect(result?.artist).toBe("Artist");
+  });
+
+  it("falls back to 0 when listeners or bitrate is missing", () => {
+    const result = parseIcecastStatus({
+      icestats: {
+        source: { title: "A - B", listener_peak: 0 }
+      }
+    });
+    expect(result?.listeners).toBe(0);
+    expect(result?.bitrate).toBe(0);
+  });
+});
+
+describe("fetchIcecastStatus", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("returns null if !response.ok", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+    const result = await fetchIcecastStatus("https://x/status-json.xsl");
+    expect(result).toBeNull();
+  });
+
+  it("returns the parsed status on valid response", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ icestats: { source: { title: "A - B", listeners: 5, bitrate: 128, listener_peak: 10 } } })
+    }));
+    const result = await fetchIcecastStatus("https://x/status-json.xsl");
+    expect(result?.artist).toBe("A");
+    expect(result?.song).toBe("B");
   });
 });

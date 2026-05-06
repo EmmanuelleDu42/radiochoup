@@ -9,22 +9,22 @@ describe("HistoryStore", () => {
     store = new HistoryStore(5);
   });
 
-  it("retourne un historique vide au démarrage", () => {
+  it("returns an empty history on startup", () => {
     expect(store.list()).toEqual([]);
   });
 
-  it("ajoute une entrée si elle diffère de la dernière", () => {
+  it("adds an entry when it differs from the last", () => {
     store.push({ artist: "A", song: "S" });
     expect(store.list()).toHaveLength(1);
   });
 
-  it("ne duplique pas la dernière entrée", () => {
+  it("does not duplicate the last entry", () => {
     store.push({ artist: "A", song: "S" });
     store.push({ artist: "A", song: "S" });
     expect(store.list()).toHaveLength(1);
   });
 
-  it("limite à la taille max (FIFO)", () => {
+  it("limits to max size (FIFO)", () => {
     for (let i = 0; i < 10; i++) {
       store.push({ artist: `A${i}`, song: `S${i}` });
     }
@@ -34,7 +34,7 @@ describe("HistoryStore", () => {
     expect(list[4]?.song).toBe("S5");
   });
 
-  it("retourne les entrées les plus récentes en premier", () => {
+  it("returns the most recent entries first", () => {
     store.push({ artist: "A1", song: "S1" });
     store.push({ artist: "A2", song: "S2" });
     const list = store.list();
