@@ -1,0 +1,14 @@
+{
+  "name": "Radio Choup",
+  "short_name": "Choup",
+  "description": "La radio rétro-glamour qui réveille votre cuisine.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#cd7784",
+  "theme_color": "#cd7784",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
