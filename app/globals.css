@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --color-choup-pink-50: #fef2f4;
+  --color-choup-pink-100: #fce4e8;
+  --color-choup-pink-200: #f9c7d0;
+  --color-choup-pink-300: #ef929d;
+  --color-choup-pink-400: #e96875;
+  --color-choup-pink-500: #cd7784;
+  --color-choup-pink-600: #b35260;
+  --font-display: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-display);
+  background-color: var(--color-choup-pink-500);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
