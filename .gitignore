@@ -1,7 +1,28 @@
+# Env
 .env
 .env.*
-*.log
+!.env.example
+
+# Next.js
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Dependencies
 node_modules/
 vendor/
+.pnpm-store/
+
+# Tests
+playwright-report/
+test-results/
+coverage/
+
+# OS
 .DS_Store
 Thumbs.db
+*.log
+
+# BRV (ByteRover) local memory cache
+.brv/

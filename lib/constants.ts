@@ -1,0 +1,1 @@
+export const EXTERNAL_FETCH_TIMEOUT_MS = 5000;
