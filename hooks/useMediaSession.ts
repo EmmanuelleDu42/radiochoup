@@ -42,14 +42,22 @@ export function useMediaSession(params: MediaSessionParams | null): void {
       return;
     }
 
+    const guessMime = (url: string): string => {
+      if (url.endsWith(".jpg") || url.endsWith(".jpeg")) return "image/jpeg";
+      if (url.endsWith(".png")) return "image/png";
+      if (url.endsWith(".webp")) return "image/webp";
+      return "image/jpeg";
+    };
+
     const sizes: Array<keyof CoverArt["sizes"]> = ["s96", "s128", "s192", "s256", "s384", "s512"];
     const artwork = params.cover
       ? sizes.map((key) => {
           const px = key.slice(1);
+          const src = params.cover!.sizes[key];
           return {
-            src: params.cover!.sizes[key],
+            src,
             sizes: `${px}x${px}`,
-            type: "image/png"
+            type: guessMime(src)
           };
         })
       : [];

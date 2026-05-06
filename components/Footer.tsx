@@ -4,11 +4,7 @@ export function Footer() {
       <a href="https://www.mariepierrepastini.fr/" rel="external noreferrer" target="_blank" className="hover:underline">
         Webdesign MP Pastini
       </a>{" "}
-      —{" "}
-      <a href="#" className="hover:underline">
-        Développement Cef-i
-      </a>{" "}
-      —{" "}
+      — <span>Développement Cef-i</span> —{" "}
       <span>Radio Choup, tous droits réservés</span>
     </footer>
   );

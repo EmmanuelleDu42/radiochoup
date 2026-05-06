@@ -7,8 +7,8 @@ import type { NowPlaying, HistoryEntry } from "@/lib/types";
 const nowPlayingSchema = z.object({
   song: z.string(),
   artist: z.string(),
-  listeners: z.number().nullable(),
-  bitrate: z.number().nullable(),
+  listeners: z.number(),
+  bitrate: z.number(),
   fetchedAt: z.string()
 });
 
@@ -73,6 +73,15 @@ function ensureConnection() {
   source.onerror = () => {
     currentState = { ...currentState, connected: false };
     notify();
+    if (source && source.readyState === EventSource.CLOSED) {
+      // Connexion fatalement fermée par le navigateur — reconnexion manuelle après backoff
+      source = null;
+      if (refCount > 0) {
+        setTimeout(() => {
+          if (refCount > 0) ensureConnection();
+        }, 3000);
+      }
+    }
   };
 }
 

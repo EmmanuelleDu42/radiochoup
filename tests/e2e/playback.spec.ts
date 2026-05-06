@@ -18,8 +18,9 @@ test.describe("playback", () => {
 
   test("le titre de page suit le morceau (eventually)", async ({ page }) => {
     await page.goto("/");
-    await page.waitForTimeout(6000);
-    const title = await page.title();
-    expect(title.length).toBeGreaterThan(3);
+    await expect.poll(async () => (await page.title()).length, {
+      timeout: 10000,
+      intervals: [500, 1000, 2000]
+    }).toBeGreaterThan(3);
   });
 });

@@ -62,6 +62,6 @@ export async function getCoverArt(params: {
   if (!url) {
     return { url: fallback, source: "default", sizes: buildArtworkSizes(fallback) };
   }
-  const high = url.replace("100x100bb", "512x512bb");
-  return { url: high, source: "itunes", sizes: buildArtworkSizes(high) };
+  const sizes = buildArtworkSizes(url);
+  return { url: sizes.s512, source: "itunes", sizes };
 }
