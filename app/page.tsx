@@ -1,7 +1,46 @@
-export default function HomePage() {
+import type { Metadata } from "next";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { Player } from "@/components/Player";
+import { PlayerMobile } from "@/components/PlayerMobile";
+import { streamSource } from "@/lib/stream-source";
+import { getCoverArt } from "@/lib/itunes";
+import { getServerEnv } from "@/lib/env.server";
+import { clientEnv } from "@/lib/env.client";
+
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const current = streamSource.getCurrent();
+  if (!current) return { title: clientEnv.NEXT_PUBLIC_RADIO_NAME };
+  return {
+    title: `${current.song} — ${current.artist}`,
+    description: `En direct sur ${clientEnv.NEXT_PUBLIC_RADIO_NAME} : ${current.song} par ${current.artist}.`
+  };
+}
+
+export default async function HomePage() {
+  const current = streamSource.getCurrent();
+  const cover = current
+    ? await getCoverArt({ artist: current.artist, song: current.song })
+    : null;
+
   return (
-    <main className="text-choup-pink-100 flex min-h-screen items-center justify-center">
-      <h1 className="text-4xl font-bold">Radio Choup — refonte en cours</h1>
-    </main>
+    <>
+      <Header />
+      <main className="mx-auto max-w-5xl px-4 py-8">
+        <Player
+          streamUrl={getServerEnv().STREAM_URL}
+          defaultCoverUrl={clientEnv.NEXT_PUBLIC_DEFAULT_COVER}
+          cover={cover}
+        />
+        <PlayerMobile
+          streamUrl={getServerEnv().STREAM_URL}
+          defaultCoverUrl={clientEnv.NEXT_PUBLIC_DEFAULT_COVER}
+          cover={cover}
+        />
+      </main>
+      <Footer />
+    </>
   );
 }
