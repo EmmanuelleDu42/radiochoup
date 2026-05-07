@@ -38,7 +38,7 @@ export function Player({
   const artist = nowPlaying?.artist ?? "...";
 
   return (
-    <section className="hidden lg:flex lg:justify-center">
+    <section className="hidden lg:flex lg:justify-center" style={{ marginBottom: "8px" }}>
       {/* Radio container — ratio 673×475 */}
       <div
         className="relative"

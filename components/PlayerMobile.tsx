@@ -100,16 +100,17 @@ export function PlayerMobile({
       </div>
 
       {/* Radio GSM — image complète, proportions préservées */}
+      {/* Legacy: width 370px height 600px background-size:cover — on prend 90vw minimum */}
       <div
         className="relative"
         style={{
           backgroundImage: "url('/img/radio_ancienne_gsm.jpg')",
           backgroundRepeat: "no-repeat",
-          backgroundSize: "contain",
+          backgroundSize: "cover",
           backgroundPosition: "top center",
-          width: "min(370px, 100vw)",
+          width: "min(370px, 90vw)",
           aspectRatio: "370 / 600",
-          maxWidth: "100vw",
+          maxWidth: "90vw",
           flexShrink: 0
         }}
       >
@@ -224,7 +225,9 @@ export function PlayerMobile({
           className="flex flex-col items-center gap-1"
           style={{ color: "#fff", background: "none", border: "none", cursor: "pointer", fontSize: "10px" }}
         >
-          <Music size={22} />
+          <span style={{ background: "#71bfbb", borderRadius: "50%", padding: "5px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Music size={20} color="#fff" />
+          </span>
           <span>Paroles</span>
         </button>
         <button
@@ -233,7 +236,9 @@ export function PlayerMobile({
           className="flex flex-col items-center gap-1"
           style={{ color: "#fff", background: "none", border: "none", cursor: "pointer", fontSize: "10px" }}
         >
-          <History size={22} />
+          <span style={{ background: "#71bfbb", borderRadius: "50%", padding: "5px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <History size={20} color="#fff" />
+          </span>
           <span>Historique</span>
         </button>
         <button
@@ -242,7 +247,9 @@ export function PlayerMobile({
           className="flex flex-col items-center gap-1"
           style={{ color: "#fff", background: "none", border: "none", cursor: "pointer", fontSize: "10px" }}
         >
-          <CalendarDays size={22} />
+          <span style={{ background: "#71bfbb", borderRadius: "50%", padding: "5px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CalendarDays size={20} color="#fff" />
+          </span>
           <span>Programme</span>
         </button>
       </div>
