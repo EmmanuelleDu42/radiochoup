@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 @theme {
+  --color-choup-pink: #cd7784;
+  --color-choup-pink-soft: #ef929d;
+  --color-choup-mauve: #a992bd;
+  --color-choup-turquoise: #71bfbb;
+  /* Keep legacy scale too for compatibility */
   --color-choup-pink-50: #fef2f4;
   --color-choup-pink-100: #fce4e8;
   --color-choup-pink-200: #f9c7d0;
@@ -15,8 +20,103 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: var(--font-display);
-  background-color: var(--color-choup-pink-500);
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  background-color: #cd7784;
+  background-image: url('/img/bg_c.jpg');
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+/* Custom range input — track blanc, thumb blanc rond 20px */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 100%;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+/* Webkit track */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 5px;
+  cursor: pointer;
+  background: #fff;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+/* Webkit thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  margin-top: -8px;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+/* Firefox track */
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 5px;
+  cursor: pointer;
+  background: #fff;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+/* Firefox thumb */
+input[type="range"]::-moz-range-thumb {
+  border: 0;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+/* IE/Edge */
+input[type="range"]::-ms-track {
+  width: 100%;
+  height: 5px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  border-width: 10px 0;
+  color: transparent;
+}
+
+input[type="range"]::-ms-fill-lower,
+input[type="range"]::-ms-fill-upper {
+  background: #fff;
+  border: 0 solid #000101;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+input[type="range"]::-ms-thumb {
+  border: 0;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+/* Google Font Share for now-playing */
+.info-current-song {
+  font-family: 'Share', sans-serif;
+  text-align: center;
+  color: #fff;
+  text-transform: uppercase;
 }
 
 @media (prefers-reduced-motion: reduce) {

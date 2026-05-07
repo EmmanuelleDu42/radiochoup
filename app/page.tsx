@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { PromoBar } from "@/components/PromoBar";
 import { PlayerShell } from "@/components/PlayerShell";
 import { streamSource } from "@/lib/stream-source";
 import { getCoverArt } from "@/lib/itunes";
@@ -30,14 +31,15 @@ export default async function HomePage() {
 
   return (
     <>
-      <Header />
-      <main className="mx-auto max-w-5xl px-4 py-8">
+      <Header cover={cover} defaultCoverUrl={clientEnv.NEXT_PUBLIC_DEFAULT_COVER} />
+      <main>
         <PlayerShell
           streamUrl={getServerEnv().STREAM_URL}
           defaultCoverUrl={clientEnv.NEXT_PUBLIC_DEFAULT_COVER}
           initialCover={cover}
         />
       </main>
+      <PromoBar />
       <Footer />
     </>
   );
