@@ -80,6 +80,9 @@ export function PlayerShell({ streamUrl, defaultCoverUrl, initialCover }: Props)
         onToggle={() => void player.toggle()}
         onSetVolume={player.setVolume}
         onToggleMute={player.toggleMute}
+        onOpenHistory={() => setOpenHistory(true)}
+        onOpenLyrics={() => setOpenLyrics(true)}
+        onOpenProgram={() => setOpenProgram(true)}
       />
       <HistoryModal open={openHistory} onClose={() => setOpenHistory(false)} entries={history.slice(0, 5)} />
       <LyricsModal

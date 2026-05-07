@@ -41,18 +41,49 @@ export function Modal({ open, onClose, title, titleId, maxWidthClass = "max-w-xl
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
-            className={`max-h-[80vh] w-full ${maxWidthClass} overflow-y-auto rounded-xl bg-white p-6 shadow-2xl`}
+            className={`max-h-[80vh] w-full ${maxWidthClass} overflow-y-auto p-6 shadow-2xl`}
+            style={{
+              backgroundColor: "rgba(0,0,0,0.85)",
+              borderRadius: 0,
+              color: "#fff"
+            }}
             onClick={(e) => e.stopPropagation()}
           >
-            <header className="mb-4 flex items-center justify-between">
-              <h2 id={titleId} className="text-xl font-bold text-choup-pink-600">
+            <header
+              style={{
+                marginBottom: "16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}
+            >
+              <h2
+                id={titleId}
+                style={{
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  color: "#ef929d",
+                  margin: 0,
+                  fontFamily: '"Trebuchet MS", Arial, sans-serif'
+                }}
+              >
                 {title}
               </h2>
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Fermer"
-                className="rounded p-1 hover:bg-choup-pink-100"
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#ef929d",
+                  padding: "4px",
+                  borderRadius: 0,
+                  transition: "opacity 0.2s"
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
               >
                 <X size={20} />
               </button>
