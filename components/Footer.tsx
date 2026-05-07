@@ -7,8 +7,8 @@ export function Footer() {
         background: "url('/img/background_footer.png') repeat",
         textAlign: "center",
         padding: "12px 16px",
-        fontSize: "13px",
-        color: "#fff"
+        fontSize: "15px",
+        color: "#ffffff"
       }}
     >
       <a
