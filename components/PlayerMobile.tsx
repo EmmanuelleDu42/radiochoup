@@ -40,33 +40,20 @@ export function PlayerMobile({
 
   return (
     <section className="lg:hidden flex flex-col items-center w-full">
-      {/* Cover art au-dessus de la radio */}
+      {/* Cover art au-dessus de la radio — sans le tableau (mobile) */}
       <div className="flex justify-center pt-4 pb-2">
         <div
-          className="relative"
           style={{
-            background: "url('/img/Tableau.png') no-repeat center",
-            backgroundSize: "contain",
-            width: "110px",
-            height: "110px",
-            flexShrink: 0
+            width: "80px",
+            height: "80px",
+            backgroundImage: `url('${coverUrl}')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            transition: "background-image 1s",
+            boxShadow: "0px 5px 10px 3px rgba(0,0,0,0.4)",
+            borderRadius: "4px"
           }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: "14px",
-              left: "20px",
-              width: "70px",
-              height: "70px",
-              backgroundImage: `url('${coverUrl}')`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              transition: "background-image 1s",
-              boxShadow: "0px 5px 10px 3px rgba(0,0,0,0.4)"
-            }}
-          />
-        </div>
+        />
       </div>
 
       {/* Now-playing centré */}
@@ -215,43 +202,70 @@ export function PlayerMobile({
         className="fixed bottom-0 left-0 right-0 flex items-center justify-around py-3 lg:hidden"
         style={{
           background: "rgba(205,119,132,0.95)",
-          borderTop: "1px solid #ef929d",
+          borderTop: "2px solid #ef929d",
           zIndex: 40
         }}
       >
-        <button
-          type="button"
-          onClick={onOpenLyrics}
-          className="flex flex-col items-center gap-1"
-          style={{ color: "#fff", background: "none", border: "none", cursor: "pointer", fontSize: "10px" }}
-        >
-          <span style={{ background: "#71bfbb", borderRadius: "50%", padding: "5px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Music size={20} color="#fff" />
-          </span>
-          <span>Paroles</span>
-        </button>
-        <button
-          type="button"
-          onClick={onOpenHistory}
-          className="flex flex-col items-center gap-1"
-          style={{ color: "#fff", background: "none", border: "none", cursor: "pointer", fontSize: "10px" }}
-        >
-          <span style={{ background: "#71bfbb", borderRadius: "50%", padding: "5px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <History size={20} color="#fff" />
-          </span>
-          <span>Historique</span>
-        </button>
-        <button
-          type="button"
-          onClick={onOpenProgram}
-          className="flex flex-col items-center gap-1"
-          style={{ color: "#fff", background: "none", border: "none", cursor: "pointer", fontSize: "10px" }}
-        >
-          <span style={{ background: "#71bfbb", borderRadius: "50%", padding: "5px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <CalendarDays size={20} color="#fff" />
-          </span>
-          <span>Programme</span>
-        </button>
+        {[
+          { label: "Paroles", Icon: Music, onClick: onOpenLyrics },
+          { label: "Historique", Icon: History, onClick: onOpenHistory },
+          { label: "Programme", Icon: CalendarDays, onClick: onOpenProgram }
+        ].map(({ label, Icon, onClick }) => (
+          <button
+            key={label}
+            type="button"
+            onClick={onClick}
+            className="flex flex-col items-center gap-1"
+            style={{
+              color: "#fff",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "11px",
+              fontFamily: '"Trebuchet MS", Arial, sans-serif',
+              fontWeight: 600,
+              padding: "4px 8px",
+              borderRadius: "8px",
+              transition: "background 0.15s, transform 0.1s"
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "none";
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+            onMouseDown={(e) => {
+              e.currentTarget.style.transform = "scale(0.92)";
+            }}
+            onMouseUp={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+            onTouchStart={(e) => {
+              e.currentTarget.style.background = "rgba(255,255,255,0.2)";
+              e.currentTarget.style.transform = "scale(0.92)";
+            }}
+            onTouchEnd={(e) => {
+              e.currentTarget.style.background = "none";
+              e.currentTarget.style.transform = "scale(1)";
+            }}
+          >
+            <span
+              style={{
+                background: "#71bfbb",
+                borderRadius: "50%",
+                padding: "6px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.25)"
+              }}
+            >
+              <Icon size={20} color="#fff" />
+            </span>
+            <span>{label}</span>
+          </button>
+        ))}
       </div>
 
       {/* Spacer pour le footer fixe */}
