@@ -27,10 +27,11 @@ export function Header({ cover, defaultCoverUrl = "/img/bg-capa.jpg" }: Props) {
             <Image
               src="/img/logo.png"
               alt="Radio Choup - cooking radio"
-              width={180}
-              height={100}
+              width={220}
+              height={110}
               priority
-              className="h-[100px] w-auto object-contain"
+              className="w-auto object-contain"
+              style={{ height: "110px", maxWidth: "100%" }}
             />
           </Link>
         </div>
@@ -73,23 +74,32 @@ export function Header({ cover, defaultCoverUrl = "/img/bg-capa.jpg" }: Props) {
 
         {/* Col 3 — Tableau cuisine + cover album */}
         <div className="col-span-3 flex h-full items-center justify-end">
+          {/*
+            Le Tableau.png fait ~200px × ~163px pour conserver le ratio de l'image.
+            Dans le legacy CSS : currentCoverArt top:61px left:37px width:32%
+            Ici le conteneur fait 200×163 donc :
+              top = 61 * (163/230) ≈ 43px  (on garde 43px)
+              left = 37px
+              width = 32% de 200px ≈ 64px
+          */}
           <div
             className="relative hidden sm:block"
             style={{
               background: "url('/img/Tableau.png') no-repeat center",
               backgroundSize: "contain",
-              width: "160px",
-              height: "130px"
+              width: "200px",
+              height: "163px",
+              flexShrink: 0
             }}
           >
-            {/* Cover art positionné dans le tableau */}
+            {/* Cover art positionné dans le tableau, calé sur le legacy top:61px left:37px width:32% */}
             <div
               className="absolute"
               style={{
-                top: "18px",
-                left: "30px",
-                width: "60px",
-                height: "60px",
+                top: "43px",
+                left: "37px",
+                width: "64px",
+                height: "64px",
                 backgroundImage: `url('${coverUrl}')`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",

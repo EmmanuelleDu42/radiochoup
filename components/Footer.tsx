@@ -7,15 +7,15 @@ export function Footer() {
         background: "url('/img/background_footer.png') repeat",
         textAlign: "center",
         padding: "12px 16px",
-        fontSize: "11px",
-        color: "#333"
+        fontSize: "13px",
+        color: "#fff"
       }}
     >
       <a
         href="https://www.mariepierrepastini.fr/"
         rel="external noreferrer"
         target="_blank"
-        style={{ color: "#333", textDecoration: "none" }}
+        style={{ color: "#fff", textDecoration: "none" }}
         onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
         onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
       >

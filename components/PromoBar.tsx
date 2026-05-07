@@ -8,9 +8,10 @@ export function PromoBar() {
         background: "#fff"
       }}
     >
-      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-0 sm:grid-cols-3">
+      {/* grid-cols-3 avec colonnes égales et padding uniforme */}
+      <div className="mx-auto grid max-w-5xl grid-cols-1 sm:grid-cols-3">
         {/* App Store */}
-        <div className="flex items-center justify-center bg-white p-3">
+        <div className="flex flex-1 items-center justify-center bg-white px-4 py-3">
           <Image
             src="/img/appstore.jpg"
             alt="Télécharger sur l'App Store"
@@ -21,7 +22,7 @@ export function PromoBar() {
         </div>
 
         {/* Faites un don */}
-        <div className="flex items-center justify-center bg-white p-3">
+        <div className="flex flex-1 items-center justify-center bg-white px-4 py-3">
           <Image
             src="/img/FaitesUnDon.png"
             alt="Faites un don"
@@ -32,7 +33,7 @@ export function PromoBar() {
         </div>
 
         {/* Polkamatik / Deguizland */}
-        <div className="flex items-center justify-center bg-white p-3">
+        <div className="flex flex-1 items-center justify-center bg-white px-4 py-3">
           <a
             href="https://www.deguizland.com/catalogsearch/result/?q=ann%C3%A9e+50"
             target="_blank"
