@@ -27,7 +27,7 @@ export function Header({ cover, defaultCoverUrl = "/img/bg-capa.jpg" }: Props) {
         style={{ minHeight: "146px", alignItems: "center" }}
       >
         {/* Col 3 — Logo */}
-        <div className="col-span-3 flex h-full items-center">
+        <div className="col-span-3 flex h-full items-center pt-2 sm:pt-0">
           <Link href="/" title="Radio Choup">
             <Image
               src="/img/logo.png"

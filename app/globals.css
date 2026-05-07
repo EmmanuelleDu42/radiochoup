@@ -23,11 +23,23 @@ body {
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   font-size: 14px;
   background-color: #cd7784;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* bg_c.jpg rendu via ::before pour pouvoir lui appliquer un filtre
+   de saturation/contraste sans toucher au contenu textuel ou aux composants */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
   background-image: url('/img/bg_c.jpg');
   background-repeat: no-repeat;
   background-position: top center;
   background-size: auto;
-  overflow-x: hidden;
+  filter: saturate(1.12) contrast(1.06);
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* Custom range input — track blanc, thumb blanc rond 20px */
