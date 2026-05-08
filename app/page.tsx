@@ -10,20 +10,14 @@ import { getServerEnv } from "@/lib/env.server";
 import { clientEnv } from "@/lib/env.client";
 
 function discoverRadioImages(): string[] {
-  const dir = path.join(process.cwd(), "public", "img");
-  const files = fs.readdirSync(dir);
-  const pattern = /^radio_ancienne(?:_(\d+))?\.png$/;
-  const matches = files
-    .map((f) => {
-      const m = pattern.exec(f);
-      if (!m) return null;
-      const idx = m[1] ? parseInt(m[1], 10) : 1;
-      return { file: f, idx };
-    })
-    .filter((x): x is { file: string; idx: number } => x !== null)
-    .sort((a, b) => a.idx - b.idx)
-    .map((x) => `/img/${x.file}`);
-  return matches.length > 0 ? matches : ["/img/radio_ancienne.png"];
+  const dir = path.join(process.cwd(), "public", "img", "template_radio");
+  const collator = new Intl.Collator(undefined, { numeric: true });
+  const matches = fs
+    .readdirSync(dir)
+    .filter((f) => /^radio_ancienne_\d+\.png$/.test(f))
+    .sort(collator.compare)
+    .map((f) => `/img/template_radio/${f}`);
+  return matches.length > 0 ? matches : ["/img/template_radio/radio_ancienne_0.png"];
 }
 
 export const dynamic = "force-dynamic";
