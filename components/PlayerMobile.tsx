@@ -39,151 +39,269 @@ export function PlayerMobile({
   const coverUrl = cover?.url ?? defaultCoverUrl;
 
   return (
-    <section className="lg:hidden flex flex-col items-center w-full">
-      {/* Cover art au-dessus de la radio — sans le tableau (mobile) */}
-      <div className="flex justify-center pt-4 pb-2">
-        <div
-          style={{
-            width: "80px",
-            height: "80px",
-            backgroundImage: `url('${coverUrl}')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            transition: "background-image 1s",
-            boxShadow: "0px 5px 10px 3px rgba(0,0,0,0.4)",
-            borderRadius: "4px"
-          }}
-        />
-      </div>
-
-      {/* Now-playing centré */}
-      <div className="text-center px-4 mb-2">
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={song}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.35 }}
-            className="info-current-song"
-            style={{ fontSize: "13px", fontWeight: 700, margin: "0 0 2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "90vw" }}
-          >
-            {song}
-          </motion.p>
-        </AnimatePresence>
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={artist}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.35, delay: 0.08 }}
-            className="info-current-song"
-            style={{ fontSize: "11px", fontWeight: 700, margin: 0 }}
-          >
-            {artist}
-          </motion.p>
-        </AnimatePresence>
-      </div>
-
-      {/* Radio GSM — image complète, proportions préservées */}
-      {/* Legacy: width 370px height 600px background-size:cover — on prend 90vw minimum */}
+    <section
+      id="player-mobile-section"
+      className="lg:hidden flex flex-col items-center w-full"
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 30,
+        padding: 0,
+        background: "#14342f"
+      }}
+    >
+      {/* Hero plein écran — image radio en bas, respiration en haut */}
       <div
-        className="relative"
+        id="mobile-hero"
         style={{
-          backgroundImage: "url('/img/radio_ancienne_gsm.jpg')",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          backgroundPosition: "top center",
-          width: "min(370px, 90vw)",
-          aspectRatio: "370 / 600",
-          maxWidth: "90vw",
-          flexShrink: 0
+          position: "relative",
+          width: "100vw",
+          flex: 1,
+          minHeight: 0,
+          overflow: "hidden",
+          background: "#14342f",
+          isolation: "isolate"
         }}
       >
-        {/* Bouton play — positionné sur le "haut-parleur" de la radio gsm */}
-        {/* top: 185px / 600 ≈ 30.8% ; left: ~50% centré */}
+        {/* Fond hero — mur teal + table en bois (sans radio) ; sur écrans larges l'image descend pour révéler le haut */}
         <div
-          className="absolute"
+          id="mobile-hero-visual"
+          aria-hidden
           style={{
-            top: "30%",
-            left: "50%",
-            transform: "translate(-50%, 0)"
+            position: "absolute",
+            inset: 0,
+            backgroundImage: "url('/img/radio-choup-mobile-fond.webp')",
+            backgroundSize: "cover",
+            backgroundPosition: "center calc(100% + 100px + max(0px, (100vw - 600px) * 0.45))",
+            transform: "scale(1.015)"
           }}
-        >
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-label={isPlaying ? "Mettre en pause" : "Lire"}
-            style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
-          >
-            <motion.div
-              animate={isPlaying ? { scale: [1, 1.07, 1] } : { scale: 1 }}
-              transition={{ repeat: isPlaying ? Infinity : 0, duration: 1.5 }}
-            >
-              <Image
-                src={isPlaying ? "/img/lecteur/btn_pause.png" : "/img/lecteur/btn_play.png"}
-                alt={isPlaying ? "Pause" : "Play"}
-                width={70}
-                height={70}
-                style={{ height: "70px", width: "auto" }}
-              />
-            </motion.div>
-          </button>
-        </div>
+        />
 
-        {/* Zone titre — positionnée dans la zone écran du GSM */}
-        {/* top: 242px / 600 ≈ 40.3% */}
-        <div
-          className="absolute text-center"
+        {/* Radio posée — DEUX couches : 1) corps avec ombre (antenne clippée pour pas de halo), 2) image complète au-dessus */}
+        <img
+          id="mobile-hero-radio-shadow"
+          src="/img/radio_ancienne_mobile.png"
+          alt=""
+          aria-hidden
           style={{
-            top: "40%",
-            left: "5%",
-            right: "5%"
+            position: "absolute",
+            left: "50%",
+            bottom: "min(calc(39vw - 150px), calc(100% - 57.7vw - 120px), 14px)",
+            transform: "translateX(-50%)",
+            width: "82%",
+            height: "auto",
+            zIndex: 1,
+            pointerEvents: "none",
+            clipPath: "inset(12% 0 0 0)",
+            filter:
+              "drop-shadow(0 8px 3px rgba(255,225,180,0.65)) drop-shadow(0 14px 6px rgba(255,220,170,0.3))"
+          }}
+        />
+        <img
+          id="mobile-hero-radio"
+          src="/img/radio_ancienne_mobile.png"
+          alt=""
+          aria-hidden
+          style={{
+            position: "absolute",
+            left: "50%",
+            bottom: "min(calc(39vw - 150px), calc(100% - 57.7vw - 120px), 14px)",
+            transform: "translateX(-50%)",
+            width: "82%",
+            height: "auto",
+            zIndex: 2,
+            pointerEvents: "none"
+          }}
+        />
+
+        {/* Overlay gradient pour la lisibilité */}
+        <div
+          id="mobile-hero-overlay"
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            zIndex: 1,
+            background:
+              "linear-gradient(to bottom, rgba(8,23,21,0.62) 0%, rgba(8,23,21,0.10) 38%, rgba(8,23,21,0.20) 60%, rgba(8,23,21,0.55) 100%), radial-gradient(circle at 50% 44%, rgba(55,207,196,0.18), transparent 45%)"
+          }}
+        />
+
+        {/* Contenu superposé */}
+        <div
+          id="mobile-hero-content"
+          style={{
+            position: "relative",
+            zIndex: 2,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            padding: "clamp(24px, 6vw, 36px) clamp(20px, 5vw, 28px)",
+            color: "#fffaf1"
           }}
         >
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={`gsm-${song}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="info-current-song"
-              style={{ fontSize: "11px", fontWeight: 700, margin: "0 0 2px", lineHeight: 1.3 }}
-            >
-              {song}
-            </motion.p>
-          </AnimatePresence>
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={`gsm-artist-${artist}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="info-current-song"
-              style={{ fontSize: "10px", fontWeight: 700, margin: 0, lineHeight: 1.3 }}
-            >
-              {artist}
-            </motion.p>
-          </AnimatePresence>
+          {/* Kicker */}
+          <span
+            id="mobile-hero-kicker"
+            style={{
+              alignSelf: "flex-start",
+              padding: "7px 13px",
+              border: "1px solid rgba(255,250,241,0.28)",
+              borderRadius: "999px",
+              color: "#f5ead8",
+              background: "rgba(12,45,41,0.36)",
+              backdropFilter: "blur(10px)",
+              fontSize: "0.72rem",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              fontWeight: 700
+            }}
+          >
+            Radio Choup · En direct
+          </span>
+
+          {/* Now-playing : pochette + titre + artiste */}
+          <div
+            id="mobile-hero-now-playing"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "14px",
+              marginTop: "22px"
+            }}
+          >
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.div
+                id="mobile-cover-art"
+                key={coverUrl}
+                initial={{ x: -40, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 40, opacity: 0 }}
+                transition={{ duration: 0.55, ease: [0.22, 0.9, 0.3, 1] }}
+                style={{
+                  flexShrink: 0,
+                  width: "62px",
+                  height: "62px",
+                  backgroundImage: `url('${coverUrl}')`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  borderRadius: "8px",
+                  boxShadow: "0 6px 18px rgba(0,0,0,0.35)",
+                  border: "1px solid rgba(255,250,241,0.18)"
+                }}
+              />
+            </AnimatePresence>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  id="mobile-now-playing-song"
+                  key={song}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.32 }}
+                  style={{
+                    fontSize: "1rem",
+                    fontWeight: 700,
+                    lineHeight: 1.15,
+                    color: "#fffaf1",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical"
+                  }}
+                >
+                  {song}
+                </motion.div>
+              </AnimatePresence>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  id="mobile-now-playing-artist"
+                  key={artist}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.32, delay: 0.06 }}
+                  style={{
+                    marginTop: "3px",
+                    fontSize: "0.82rem",
+                    fontWeight: 500,
+                    color: "rgba(255,250,241,0.78)",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                  }}
+                >
+                  {artist}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+
+          <div style={{ flex: 1 }} />
         </div>
       </div>
 
-      {/* Volume slider sous la radio */}
+      {/* Volume slider — flottant juste au-dessus du footer nav */}
       <div
-        className="flex items-center gap-3 px-6 py-3 w-full max-w-xs"
+        id="mobile-volume-bar"
+        className="flex items-center gap-3"
+        style={{
+          width: "100%",
+          maxWidth: "430px",
+          padding: "10px 18px 14px",
+          color: "#fffaf1",
+          background: "rgba(20,52,47,0.92)",
+          backdropFilter: "blur(8px)"
+        }}
       >
+        {/* Bouton play/pause compact à gauche du contrôle volume */}
         <button
+          id="mobile-play-pause-btn"
+          type="button"
+          onClick={onToggle}
+          aria-label={isPlaying ? "Mettre en pause" : "Lire"}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 0,
+            flexShrink: 0,
+            filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.35))"
+          }}
+        >
+          <motion.div
+            animate={isPlaying ? { scale: [1, 1.07, 1] } : { scale: 1 }}
+            transition={{ repeat: isPlaying ? Infinity : 0, duration: 1.5 }}
+          >
+            <Image
+              src={isPlaying ? "/img/lecteur/btn_pause.png" : "/img/lecteur/btn_play.png"}
+              alt={isPlaying ? "Pause" : "Play"}
+              width={36}
+              height={36}
+              style={{ height: "36px", width: "auto" }}
+            />
+          </motion.div>
+        </button>
+        <button
+          id="mobile-volume-mute-btn"
           type="button"
           onClick={onToggleMute}
           aria-label={muted ? "Activer le son" : "Couper le son"}
-          style={{ color: "#71bfbb", background: "none", border: "none", cursor: "pointer", flexShrink: 0 }}
+          style={{
+            color: "#71bfbb",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            flexShrink: 0,
+            padding: 0
+          }}
         >
-          {muted ? <VolumeX size={24} /> : <Volume2 size={24} />}
+          {muted ? <VolumeX size={22} /> : <Volume2 size={22} />}
         </button>
         <input
+          id="mobile-volume-slider"
           type="range"
           min={0}
           max={100}
@@ -192,32 +310,38 @@ export function PlayerMobile({
           onChange={(e) => onSetVolume(Number(e.currentTarget.value))}
           style={{ flex: 1 }}
         />
-        <span style={{ color: "#fff", fontSize: "11px", minWidth: "28px", textAlign: "right" }}>
+        <span
+          id="mobile-volume-value"
+          style={{ fontSize: "11px", minWidth: "28px", textAlign: "right", color: "#fffaf1" }}
+        >
           {muted ? 0 : volume}
         </span>
       </div>
 
-      {/* Footer fixe mobile : Paroles / Historique / Programme */}
+      {/* Footer mobile : Paroles / Historique / Programme */}
       <div
-        className="fixed bottom-0 left-0 right-0 flex items-center justify-around py-3 lg:hidden"
+        id="mobile-bottom-nav"
+        className="flex items-center justify-around py-3 lg:hidden"
         style={{
-          background: "rgba(205,119,132,0.95)",
-          borderTop: "2px solid #ef929d",
-          zIndex: 40
+          width: "100%",
+          background: "rgba(58,38,24,0.92)",
+          borderTop: "1px solid rgba(245,234,216,0.18)",
+          backdropFilter: "blur(8px)"
         }}
       >
         {[
-          { label: "Paroles", Icon: Music, onClick: onOpenLyrics },
-          { label: "Historique", Icon: History, onClick: onOpenHistory },
-          { label: "Programme", Icon: CalendarDays, onClick: onOpenProgram }
-        ].map(({ label, Icon, onClick }) => (
+          { id: "mobile-nav-lyrics", label: "Paroles", Icon: Music, onClick: onOpenLyrics },
+          { id: "mobile-nav-history", label: "Historique", Icon: History, onClick: onOpenHistory },
+          { id: "mobile-nav-program", label: "Programme", Icon: CalendarDays, onClick: onOpenProgram }
+        ].map(({ id, label, Icon, onClick }) => (
           <button
+            id={id}
             key={label}
             type="button"
             onClick={onClick}
             className="flex flex-col items-center gap-1"
             style={{
-              color: "#fff",
+              color: "#f5ead8",
               background: "none",
               border: "none",
               cursor: "pointer",
@@ -228,22 +352,9 @@ export function PlayerMobile({
               borderRadius: "8px",
               transition: "background 0.15s, transform 0.1s"
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.15)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "none";
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-            onMouseDown={(e) => {
-              e.currentTarget.style.transform = "scale(0.92)";
-            }}
-            onMouseUp={(e) => {
-              e.currentTarget.style.transform = "scale(1)";
-            }}
             onTouchStart={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.2)";
-              e.currentTarget.style.transform = "scale(0.92)";
+              e.currentTarget.style.background = "rgba(255,250,241,0.15)";
+              e.currentTarget.style.transform = "scale(0.94)";
             }}
             onTouchEnd={(e) => {
               e.currentTarget.style.background = "none";
@@ -252,24 +363,22 @@ export function PlayerMobile({
           >
             <span
               style={{
-                background: "#71bfbb",
+                background: "#37cfc4",
                 borderRadius: "50%",
                 padding: "6px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.25)"
+                boxShadow: "0 2px 6px rgba(0,0,0,0.3)"
               }}
             >
-              <Icon size={20} color="#fff" />
+              <Icon size={20} color="#3a2618" />
             </span>
             <span>{label}</span>
           </button>
         ))}
       </div>
 
-      {/* Spacer pour le footer fixe */}
-      <div className="h-16 lg:hidden" />
     </section>
   );
 }
