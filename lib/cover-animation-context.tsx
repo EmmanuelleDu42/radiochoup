@@ -24,7 +24,7 @@ export function CoverAnimationProvider({ children }: { children: ReactNode }) {
 export function useCoverAnimation(): CoverAnimationState {
   const ctx = useContext(CoverAnimationContext);
   if (!ctx) {
-    return { isAnimating: false, startAnimation: () => {}, endAnimation: () => {} };
+    throw new Error("useCoverAnimation must be used within CoverAnimationProvider");
   }
   return ctx;
 }
