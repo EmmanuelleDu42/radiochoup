@@ -43,10 +43,19 @@ export async function fetchShoutcastStatus(streamUrl: string): Promise<Shoutcast
       signal: AbortSignal.timeout(EXTERNAL_FETCH_TIMEOUT_MS)
     });
     if (!response.ok) return null;
-    const body = await response.text();
+    const buf = await response.arrayBuffer();
+    const body = decodeWithFallback(buf);
     return parseShoutcast7HtmlBody(body);
   } catch {
     // Silent fail by design: external API errors should not crash the poll loop.
     return null;
+  }
+}
+
+function decodeWithFallback(buf: ArrayBuffer): string {
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(buf);
+  } catch {
+    return new TextDecoder("windows-1252").decode(buf);
   }
 }

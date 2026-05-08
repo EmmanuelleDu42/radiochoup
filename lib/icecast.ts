@@ -63,10 +63,20 @@ export async function fetchIcecastStatus(statusUrl: string): Promise<ParsedNowPl
       signal: AbortSignal.timeout(EXTERNAL_FETCH_TIMEOUT_MS)
     });
     if (!response.ok) return null;
-    const data = await response.json();
+    const buf = await response.arrayBuffer();
+    const text = decodeWithFallback(buf);
+    const data = JSON.parse(text);
     return parseIcecastStatus(data);
   } catch {
     // Silent fail by design: external API errors should not crash the poll loop.
     return null;
+  }
+}
+
+function decodeWithFallback(buf: ArrayBuffer): string {
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(buf);
+  } catch {
+    return new TextDecoder("windows-1252").decode(buf);
   }
 }
