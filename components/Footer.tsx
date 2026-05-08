@@ -1,11 +1,31 @@
+"use client";
+
 export function Footer() {
   return (
-    <footer className="mt-8 bg-[url('/img/background_footer.png')] bg-repeat py-4 text-center text-xs text-choup-pink-100">
-      <a href="https://www.mariepierrepastini.fr/" rel="external noreferrer" target="_blank" className="hover:underline">
+    <footer
+      id="site-credits"
+      className="hidden lg:block"
+      style={{
+        background: "transparent",
+        textAlign: "center",
+        padding: "12px 16px",
+        fontSize: "15px",
+        color: "#ffffff"
+      }}
+    >
+      <a
+        id="footer-link-pastini"
+        href="https://www.mariepierrepastini.fr/"
+        rel="external noreferrer"
+        target="_blank"
+        style={{ color: "#fff", textDecoration: "none" }}
+        onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
+        onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
+      >
         Webdesign MP Pastini
       </a>{" "}
-      — <span>Développement Cef-i</span> —{" "}
-      <span>Radio Choup, tous droits réservés</span>
+      — <span id="footer-credit-cefi">Développement Cef-i</span> —{" "}
+      <span id="footer-copyright">Radio Choup, tous droits réservés</span>
     </footer>
   );
 }

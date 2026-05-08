@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 @theme {
+  --color-choup-pink: #cd7784;
+  --color-choup-pink-soft: #ef929d;
+  --color-choup-mauve: #a992bd;
+  --color-choup-turquoise: #71bfbb;
+  /* Keep legacy scale too for compatibility */
   --color-choup-pink-50: #fef2f4;
   --color-choup-pink-100: #fce4e8;
   --color-choup-pink-200: #f9c7d0;
@@ -15,8 +20,281 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: var(--font-display);
-  background-color: var(--color-choup-pink-500);
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: #cd7784;
+  background-image: url('/img/bg_c.jpg');
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: auto;
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Mobile : la hero radio occupe tout l'écran, on retire le fond desktop */
+@media (max-width: 1023px) {
+  body {
+    background-image: none;
+    background-color: #14342f;
+  }
+}
+
+/* Custom range input — track blanc, thumb blanc rond 20px */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 100%;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+/* Webkit track */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 5px;
+  cursor: pointer;
+  background: #fff;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+/* Webkit thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  margin-top: -8px;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+/* Firefox track */
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 5px;
+  cursor: pointer;
+  background: #fff;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+/* Firefox thumb */
+input[type="range"]::-moz-range-thumb {
+  border: 0;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+/* IE/Edge */
+input[type="range"]::-ms-track {
+  width: 100%;
+  height: 5px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  border-width: 10px 0;
+  color: transparent;
+}
+
+input[type="range"]::-ms-fill-lower,
+input[type="range"]::-ms-fill-upper {
+  background: #fff;
+  border: 0 solid #000101;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+input[type="range"]::-ms-thumb {
+  border: 0;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 0 #000, 0 0 0 #0d0d0d;
+}
+
+/* Now-playing : même font que le reste du site (Trebuchet MS) */
+.info-current-song {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  text-align: center;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   #radio-switcher : bouton rétro turquoise/crème
+   ============================================================ */
+#radio-switcher {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff 0%, #f5ead8 55%, #d8cab4 100%);
+  border: 3px solid #71bfbb;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.18), 0 3px 6px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: transform 0.25s ease, box-shadow 0.2s ease;
+  z-index: 5;
+}
+
+#radio-switcher:hover {
+  transform: rotate(40deg);
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.18), 0 4px 10px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(113, 191, 187, 0.4);
+}
+
+#radio-switcher:active {
+  transform: rotate(40deg) scale(0.92);
+}
+
+/* ============================================================
+   site-footer : structure cards (fournie par le user)
+   ============================================================ */
+.site-footer {
+  background: url('/img/background_menu_bas.png') no-repeat top center, #cd7784;
+  padding: 26px 32px 16px;
+  font-family: Arial, sans-serif;
+}
+
+.footer-widgets {
+  max-width: 940px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.footer-card {
+  min-height: 150px;
+  background: #fff;
+  color: #222;
+  text-decoration: none;
+  display: grid;
+  grid-template-columns: 42% 58%;
+  align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.footer-card--don {
+  grid-template-columns: 38% 62%;
+  text-align: center;
+}
+
+.footer-card--full {
+  grid-template-columns: 1fr;
+  padding: 0;
+}
+
+.footer-card--full .footer-card__image {
+  padding: 8px;
+}
+
+.footer-card--full .footer-card__image .ftc-img,
+.footer-card--full .footer-card__image img {
+  max-height: 130px;
+}
+
+.footer-card__image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-card__image .ftc-img,
+.footer-card__image img {
+  max-width: 100%;
+  max-height: 120px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.footer-card__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.footer-card__content strong {
+  font-size: 22px;
+  color: #d1798a;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.footer-card__label {
+  display: inline-block;
+  width: fit-content;
+  padding: 8px 12px;
+  border: 3px solid #efa3af;
+  color: #8fbfc3;
+  text-transform: uppercase;
+  transform: rotate(-8deg);
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.footer-credits {
+  max-width: 940px;
+  margin: 24px auto 0;
+  text-align: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .footer-widgets {
+    grid-template-columns: 1fr;
+  }
+  .footer-card {
+    grid-template-columns: 34% 66%;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-footer {
+    padding: 22px 16px 14px;
+  }
+  .footer-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+    min-height: auto;
+  }
+  .footer-card__content {
+    align-items: center;
+  }
+  .footer-card__image .ftc-img,
+  .footer-card__image img {
+    max-height: 100px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
