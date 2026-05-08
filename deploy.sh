@@ -115,9 +115,9 @@ if ask "🔄 (Re)démarrer le serveur PM2 ?"; then
         exit 1
     fi
 
-    if pm2 list | grep -q "$APP_NAME"; then
+    if pm2 describe "$APP_NAME" >/dev/null 2>&1; then
         echo "♻️ Relance à chaud..."
-        pm2 reload "$APP_NAME"
+        pm2 reload "$APP_NAME" --update-env
     else
         echo "▶️ Premier lancement..."
         PORT=$PORT_APP pm2 start npm --name "$APP_NAME" -- start
