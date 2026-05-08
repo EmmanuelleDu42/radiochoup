@@ -13,17 +13,28 @@ interface Props {
 
 const COVER_SIZE = 220;
 const VINYL_SIZE = 240;
+const ANIMATION_DURATION_S = 3;
+const VINYL_DELAY_S = 1.2;
+const VINYL_DURATION_S = 1.8;
+const VINYL_SIDE_DRIFT_PX = 80;
+const VINYL_VERTICAL_DRIFT_PX = 30;
+// Fallback positions only fire if the layout target is missing (SSR race / layout pending).
+const HEADER_FALLBACK_OFFSET_X = 400;
+const HEADER_FALLBACK_Y = 100;
+const RADIO_FALLBACK_OFFSET_Y = 150;
 
 export function CoverArrivalAnimation({ cover }: Props) {
   const [activeUrl, setActiveUrl] = useState<string | null>(null);
   const previousUrlRef = useRef<string | null>(null);
+  const hasMountedRef = useRef(false);
   const { startAnimation, endAnimation } = useCoverAnimation();
   const headerRect = useTargetRect("#header-cover-art");
   const radioRect = useTargetRect("#radio-frame-bg");
 
   useEffect(() => {
     const url = cover?.url ?? null;
-    if (previousUrlRef.current === null) {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true;
       previousUrlRef.current = url;
       return;
     }
@@ -36,15 +47,15 @@ export function CoverArrivalAnimation({ cover }: Props) {
 
   if (!activeUrl) return null;
 
-  const viewportCenterX = typeof window !== "undefined" ? window.innerWidth / 2 : 600;
-  const viewportCenterY = typeof window !== "undefined" ? window.innerHeight / 2 : 400;
+  const viewportCenterX = window.innerWidth / 2;
+  const viewportCenterY = window.innerHeight / 2;
 
-  const headerCenterX = headerRect ? headerRect.left + headerRect.width / 2 : viewportCenterX + 400;
-  const headerCenterY = headerRect ? headerRect.top + headerRect.height / 2 : 100;
+  const headerCenterX = headerRect ? headerRect.left + headerRect.width / 2 : viewportCenterX + HEADER_FALLBACK_OFFSET_X;
+  const headerCenterY = headerRect ? headerRect.top + headerRect.height / 2 : HEADER_FALLBACK_Y;
   const headerScale = headerRect ? headerRect.width / COVER_SIZE : 0.35;
 
   const radioCenterX = radioRect ? radioRect.left + radioRect.width / 2 : viewportCenterX;
-  const radioCenterY = radioRect ? radioRect.top + radioRect.height / 2 : viewportCenterY + 150;
+  const radioCenterY = radioRect ? radioRect.top + radioRect.height / 2 : viewportCenterY + RADIO_FALLBACK_OFFSET_Y;
 
   return (
     <div
@@ -57,6 +68,7 @@ export function CoverArrivalAnimation({ cover }: Props) {
         zIndex: 9000
       }}
     >
+      {/* duration coupled with vinyl: both finish at t = ANIMATION_DURATION_S */}
       <motion.div
         key={`cover-${activeUrl}`}
         initial={{
@@ -85,7 +97,7 @@ export function CoverArrivalAnimation({ cover }: Props) {
         }}
         transition={{
           times: [0, 0.27, 0.6, 1],
-          duration: 3,
+          duration: ANIMATION_DURATION_S,
           ease: ["easeOut", "easeOut", "easeInOut"]
         }}
         onAnimationComplete={() => {
@@ -119,12 +131,12 @@ export function CoverArrivalAnimation({ cover }: Props) {
         animate={{
           x: [
             viewportCenterX - VINYL_SIZE / 2,
-            viewportCenterX - VINYL_SIZE / 2 - 80,
+            viewportCenterX - VINYL_SIZE / 2 - VINYL_SIDE_DRIFT_PX,
             radioCenterX - VINYL_SIZE / 2
           ],
           y: [
             viewportCenterY - VINYL_SIZE / 2,
-            viewportCenterY - VINYL_SIZE / 2 + 30,
+            viewportCenterY - VINYL_SIZE / 2 + VINYL_VERTICAL_DRIFT_PX,
             radioCenterY - VINYL_SIZE / 2
           ],
           scale: [0, 1, 0.55],
@@ -134,8 +146,8 @@ export function CoverArrivalAnimation({ cover }: Props) {
         }}
         transition={{
           times: [0, 0.5, 1],
-          duration: 1.8,
-          delay: 1.2,
+          duration: VINYL_DURATION_S,
+          delay: VINYL_DELAY_S,
           ease: ["easeOut", "easeIn"]
         }}
         style={{
