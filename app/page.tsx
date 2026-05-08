@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import fs from "node:fs";
 import path from "node:path";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { PromoBar } from "@/components/PromoBar";
 import { PlayerShell } from "@/components/PlayerShell";
+import { CoverAnimationProvider } from "@/lib/cover-animation-context";
 import { streamSource } from "@/lib/stream-source";
 import { getCoverArt } from "@/lib/itunes";
 import { getServerEnv } from "@/lib/env.server";
@@ -42,8 +44,8 @@ export default async function HomePage() {
     : null;
 
   return (
-    <>
-      <Header cover={cover} defaultCoverUrl={clientEnv.NEXT_PUBLIC_DEFAULT_COVER} />
+    <CoverAnimationProvider>
+      <Header initialCover={cover} defaultCoverUrl={clientEnv.NEXT_PUBLIC_DEFAULT_COVER} />
       <main id="page-main" style={{ position: "relative", top: "-50px" }}>
         <PlayerShell
           streamUrl={getServerEnv().STREAM_URL}
@@ -53,6 +55,7 @@ export default async function HomePage() {
         />
       </main>
       <PromoBar />
-    </>
+      <Footer />
+    </CoverAnimationProvider>
   );
 }
