@@ -19,12 +19,12 @@ BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 # Configuration par défaut
-DEFAULT_PORT=3000
+DEFAULT_PORT=3500
 PROJECT_NAME="Radio Choup"
 LOG_FILE="logs/startup.log"
 
-# Ports à surveiller et libérer
-REQUIRED_PORTS=($DEFAULT_PORT)
+# Ports à surveiller et libérer (série 35xx réservée à Radio Choup)
+REQUIRED_PORTS=($DEFAULT_PORT 3501 3502)
 
 # PIDs des sous-processus lancés
 CHILD_PIDS=()
