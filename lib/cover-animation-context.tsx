@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import React, { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
 interface CoverAnimationState {
   isAnimating: boolean;
