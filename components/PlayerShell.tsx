@@ -12,6 +12,7 @@ import { PlayerMobile } from "@/components/PlayerMobile";
 import { HistoryModal } from "@/components/HistoryModal";
 import { LyricsModal } from "@/components/LyricsModal";
 import { ProgramModal } from "@/components/ProgramModal";
+import { CoverArrivalAnimation } from "@/components/CoverArrivalAnimation";
 import type { CoverArt } from "@/lib/types";
 
 interface Props {
@@ -24,7 +25,10 @@ interface Props {
 export function PlayerShell({ streamUrl, defaultCoverUrl, initialCover, radioImages }: Props) {
   const player = useAudioPlayer(streamUrl);
   const { nowPlaying, history } = useStreamEvents();
-  const cover = useCover(nowPlaying ? { artist: nowPlaying.artist, song: nowPlaying.song } : null, initialCover);
+  const cover = useCover(
+    nowPlaying ? { artist: nowPlaying.artist, song: nowPlaying.song } : null,
+    initialCover
+  );
   const [openHistory, setOpenHistory] = useState(false);
   const [openLyrics, setOpenLyrics] = useState(false);
   const [openProgram, setOpenProgram] = useState(false);
@@ -59,8 +63,6 @@ export function PlayerShell({ streamUrl, defaultCoverUrl, initialCover, radioIma
     <>
       <Player
         nowPlaying={nowPlaying}
-        cover={cover}
-        defaultCoverUrl={defaultCoverUrl}
         volume={player.volume}
         muted={player.muted}
         isPlaying={player.isPlaying}
@@ -86,6 +88,7 @@ export function PlayerShell({ streamUrl, defaultCoverUrl, initialCover, radioIma
         onOpenLyrics={() => setOpenLyrics(true)}
         onOpenProgram={() => setOpenProgram(true)}
       />
+      <CoverArrivalAnimation cover={cover} />
       <HistoryModal open={openHistory} onClose={() => setOpenHistory(false)} entries={history.slice(0, 5)} />
       <LyricsModal
         open={openLyrics}
