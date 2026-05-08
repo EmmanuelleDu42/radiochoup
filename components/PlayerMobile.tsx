@@ -80,7 +80,7 @@ export function PlayerMobile({
         {/* Radio posée — DEUX couches : 1) corps avec ombre (antenne clippée pour pas de halo), 2) image complète au-dessus */}
         <img
           id="mobile-hero-radio-shadow"
-          src="/img/radio_ancienne_mobile.png"
+          src="/img/template_radio/radio_ancienne_mobile.png"
           alt=""
           aria-hidden
           style={{
@@ -99,7 +99,7 @@ export function PlayerMobile({
         />
         <img
           id="mobile-hero-radio"
-          src="/img/radio_ancienne_mobile.png"
+          src="/img/template_radio/radio_ancienne_mobile.png"
           alt=""
           aria-hidden
           style={{
