@@ -4,12 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import { Volume2, VolumeX, Repeat } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { NowPlaying as NowPlayingType, CoverArt as CoverArtType } from "@/lib/types";
+import type { NowPlaying as NowPlayingType } from "@/lib/types";
 
 interface Props {
   nowPlaying: NowPlayingType | null;
-  cover: CoverArtType | null;
-  defaultCoverUrl: string;
   volume: number;
   muted: boolean;
   isPlaying: boolean;
@@ -24,8 +22,6 @@ interface Props {
 
 export function Player({
   nowPlaying,
-  cover: _cover,
-  defaultCoverUrl: _defaultCoverUrl,
   volume,
   muted,
   isPlaying,
