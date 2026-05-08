@@ -1,9 +1,9 @@
 "use client";
 
-import { PlayButton } from "@/components/PlayButton";
-import { VolumeControl } from "@/components/VolumeControl";
-import { NowPlaying } from "@/components/NowPlaying";
-import { CoverArt } from "@/components/CoverArt";
+import { useState } from "react";
+import Image from "next/image";
+import { Volume2, VolumeX, Repeat } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import type { NowPlaying as NowPlayingType, CoverArt as CoverArtType } from "@/lib/types";
 
 interface Props {
@@ -19,12 +19,13 @@ interface Props {
   onOpenHistory: () => void;
   onOpenLyrics: () => void;
   onOpenProgram: () => void;
+  radioImages: string[];
 }
 
 export function Player({
   nowPlaying,
-  cover,
-  defaultCoverUrl,
+  cover: _cover,
+  defaultCoverUrl: _defaultCoverUrl,
   volume,
   muted,
   isPlaying,
@@ -33,42 +34,218 @@ export function Player({
   onToggleMute,
   onOpenHistory,
   onOpenLyrics,
-  onOpenProgram
+  onOpenProgram,
+  radioImages
 }: Props) {
+  const song = nowPlaying?.song ?? "...";
+  const artist = nowPlaying?.artist ?? "...";
+
+  const [radioIndex, setRadioIndex] = useState(0);
+  const radioBg = radioImages[radioIndex % radioImages.length] ?? radioImages[0];
+
+  const cycleRadio = () => setRadioIndex((i) => (i + 1) % radioImages.length);
+
   return (
     <section
-      className="hidden bg-[url('/img/radio_ancienne.png')] bg-cover bg-no-repeat lg:block"
-      style={{ minHeight: "475px" }}
+      id="player-section"
+      className="hidden lg:flex lg:justify-center"
+      style={{ marginBottom: "4px" }}
     >
-      <div className="mx-auto grid max-w-3xl grid-cols-12 items-end gap-4 p-6">
-        <div className="col-span-3">
-          <VolumeControl
-            volume={volume}
-            muted={muted}
-            onChange={onSetVolume}
-            onToggleMute={onToggleMute}
-          />
-        </div>
-        <div className="col-span-6">
-          <NowPlaying song={nowPlaying?.song ?? "..."} artist={nowPlaying?.artist ?? "..."} />
-        </div>
-        <div className="col-span-3 flex justify-end">
-          <PlayButton isPlaying={isPlaying} onToggle={onToggle} />
-        </div>
-        <div className="col-span-3">
-          <CoverArt cover={cover} fallbackUrl={defaultCoverUrl} />
-        </div>
-        <nav className="col-span-9 flex flex-wrap gap-3 text-sm">
-          <button onClick={onOpenLyrics} className="rounded bg-white/10 px-3 py-1 text-choup-pink-50 hover:bg-white/20">
-            Paroles
+      {/* Conteneur de l'image radio — rotation toutes les 15s, ratio 673x475, décalée de 150px à droite */}
+      <div
+        id="radio-frame"
+        className="relative"
+        style={{
+          width: "673px",
+          height: "475px",
+          maxWidth: "100%",
+          flexShrink: 0,
+          transform: "translateX(150px)"
+        }}
+      >
+        {/* Couche image — sans filter ni effet de bord */}
+        <div
+          id="radio-frame-bg"
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: `url('${radioBg}')`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "contain",
+            backgroundPosition: "top center",
+            transition: "background-image 0.6s ease-in-out",
+            pointerEvents: "none"
+          }}
+        />
+
+        {/* Bouton "Changer la radio" — bouton rétro turquoise/crème, en haut à droite du cadre */}
+        {radioImages.length > 1 && (
+          <button
+            id="radio-switcher"
+            type="button"
+            onClick={cycleRadio}
+            aria-label="Changer le poste de radio"
+            title="Changer le poste de radio"
+          >
+            <Repeat size={20} color="#71bfbb" strokeWidth={2.5} />
           </button>
-          <button onClick={onOpenHistory} className="rounded bg-white/10 px-3 py-1 text-choup-pink-50 hover:bg-white/20">
-            Historique
-          </button>
-          <button onClick={onOpenProgram} className="rounded bg-white/10 px-3 py-1 text-choup-pink-50 hover:bg-white/20">
-            Programme
-          </button>
-        </nav>
+        )}
+        {/* Zone des contrôles dans la radio (sur l'écran) */}
+        <div
+          id="radio-controls-zone"
+          className="absolute"
+          style={{
+            top: "280px",
+            left: "93px",
+            right: "95px",
+            paddingBottom: "30px"
+          }}
+        >
+          {/* Rangée principale : volume | now-playing | play */}
+          <div
+            id="radio-controls-row"
+            className="flex items-center justify-center gap-3 px-4"
+            style={{ minHeight: "70px" }}
+          >
+            {/* Bloc Volume (gauche) */}
+            <div
+              id="volume-block"
+              className="flex flex-col items-center gap-1"
+              style={{ minWidth: "60px" }}
+            >
+              <button
+                id="volume-mute-btn"
+                type="button"
+                onClick={onToggleMute}
+                aria-label={muted ? "Activer le son" : "Couper le son"}
+                style={{
+                  color: "#71bfbb",
+                  fontSize: "22px",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "3px"
+                }}
+              >
+                {muted ? <VolumeX size={22} /> : <Volume2 size={22} />}
+              </button>
+              <input
+                id="volume-slider"
+                type="range"
+                min={0}
+                max={100}
+                value={muted ? 0 : volume}
+                aria-label="Volume"
+                onChange={(e) => onSetVolume(Number(e.currentTarget.value))}
+                style={{ width: "70px" }}
+              />
+            </div>
+
+            {/* Bloc Now-playing (centre) */}
+            <div
+              id="now-playing-block"
+              className="flex-1 text-center"
+              style={{ minWidth: 0 }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.h2
+                  id="now-playing-song"
+                  key={song}
+                  initial={{ opacity: 0, rotateX: -90 }}
+                  animate={{ opacity: 1, rotateX: 0 }}
+                  exit={{ opacity: 0, rotateX: 90 }}
+                  transition={{ duration: 0.4 }}
+                  className="info-current-song"
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    margin: "0 0 2px",
+                    lineHeight: 1.2,
+                    paddingBottom: "5px"
+                  }}
+                >
+                  {song}
+                </motion.h2>
+              </AnimatePresence>
+              <AnimatePresence mode="wait">
+                <motion.h3
+                  id="now-playing-artist"
+                  key={artist}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="info-current-song"
+                  style={{ fontSize: "11px", fontWeight: 700, margin: 0, lineHeight: 1.2 }}
+                >
+                  {artist}
+                </motion.h3>
+              </AnimatePresence>
+            </div>
+
+            {/* Bloc Play / Pause (droite) — image bouton physique 53px */}
+            <div
+              id="play-block"
+              style={{ minWidth: "60px", display: "flex", justifyContent: "center" }}
+            >
+              <button
+                id="play-pause-btn"
+                type="button"
+                onClick={onToggle}
+                aria-label={isPlaying ? "Mettre en pause" : "Lire"}
+                style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+              >
+                <motion.div
+                  animate={isPlaying ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+                  transition={{ repeat: isPlaying ? Infinity : 0, duration: 1.5 }}
+                >
+                  <Image
+                    src={isPlaying ? "/img/lecteur/btn_pause.png" : "/img/lecteur/btn_play.png"}
+                    alt={isPlaying ? "Pause" : "Play"}
+                    width={53}
+                    height={53}
+                    style={{ height: "53px", width: "auto" }}
+                  />
+                </motion.div>
+              </button>
+            </div>
+          </div>
+
+          {/* Liens secondaires (Paroles / Historique / Programme) */}
+          <div
+            id="radio-secondary-links"
+            className="mt-2 flex justify-center gap-6"
+          >
+            {[
+              { id: "link-lyrics", label: "Paroles", onClick: onOpenLyrics },
+              { id: "link-history", label: "Historique", onClick: onOpenHistory },
+              { id: "link-program", label: "Programme", onClick: onOpenProgram }
+            ].map(({ id, label, onClick }) => (
+              <button
+                id={id}
+                key={label}
+                type="button"
+                onClick={onClick}
+                style={{
+                  color: "#000",
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "11px",
+                  textTransform: "uppercase",
+                  textDecoration: "underline",
+                  fontFamily: '"Trebuchet MS", Arial, sans-serif',
+                  transition: "opacity 0.2s"
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.75")}
+                onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
