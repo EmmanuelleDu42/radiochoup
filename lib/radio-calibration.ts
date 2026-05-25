@@ -30,6 +30,13 @@ export const RADIO_CALIBRATION: RadioCalibrationPoint[] = [
 /** Dimension native de l'asset radio (sert au calcul du scale interne). */
 export const RADIO_NATIVE_WIDTH = 673;
 
+/**
+ * Hauteur de repli du #site-header si la mesure échoue. Le header n'est jamais
+ * absent en pratique (rendu dans page.tsx) ; cette valeur n'est qu'un garde-fou
+ * correspondant à sa hauteur nominale.
+ */
+export const HEADER_FALLBACK_HEIGHT = 199;
+
 type InterpKey = Exclude<keyof RadioCalibrationPoint, "vw">;
 
 /** Interpolation linéaire par segments d'une propriété en fonction du viewport. */

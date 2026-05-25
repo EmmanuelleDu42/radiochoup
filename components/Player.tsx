@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Volume2, VolumeX, Repeat } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,6 +8,7 @@ import type { NowPlaying as NowPlayingType } from "@/lib/types";
 import {
   RADIO_CALIBRATION,
   RADIO_NATIVE_WIDTH,
+  HEADER_FALLBACK_HEIGHT,
   interpolateRadio
 } from "@/lib/radio-calibration";
 
@@ -46,8 +47,6 @@ export function Player({
 
   const cycleRadio = () => setRadioIndex((i) => (i + 1) % radioImages.length);
 
-  const wrapperRef = useRef<HTMLDivElement>(null);
-
   // Interpolation de la taille/position de la radio + position du footer à
   // partir de la table de calibration (lib/radio-calibration.ts). Pilote des
   // variables CSS sur :root, consommées par #radio-wrapper, #radio-frame et
@@ -60,7 +59,7 @@ export function Player({
       const right = interpolateRadio(RADIO_CALIBRATION, vw, "right");
       const footerTop = interpolateRadio(RADIO_CALIBRATION, vw, "footerTop");
       const header = document.getElementById("site-header");
-      const headerH = header ? header.offsetHeight : 199;
+      const headerH = header ? header.offsetHeight : HEADER_FALLBACK_HEIGHT;
       const root = document.documentElement.style;
       root.setProperty("--radio-width", `${width}px`);
       root.setProperty("--radio-top", `${top}px`);
@@ -80,7 +79,7 @@ export function Player({
       style={{ marginBottom: "4px" }}
     >
       {/* Wrapper auto-proportionnel : taille responsive + container-query (CSS dans globals.css) */}
-      <div id="radio-wrapper" ref={wrapperRef}>
+      <div id="radio-wrapper">
       {/* Conteneur intrinsèque 673×475, scalé par le wrapper via transform */}
       <div
         id="radio-frame"

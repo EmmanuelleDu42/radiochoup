@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 
 type Anchor = "right" | "left";
 
@@ -28,6 +28,10 @@ export function RadioPositionDebugger() {
   const [panelPos, setPanelPos] = useState<{ top: number; left: number }>({ top: 16, left: 16 });
   const [collapsed, setCollapsed] = useState(false);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
+  // Dernière position du panneau, tenue à jour en ref pour que le handler de
+  // fin de drag persiste la bonne valeur sans re-souscrire à chaque frame.
+  const panelPosRef = useRef(panelPos);
+  panelPosRef.current = panelPos;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -41,12 +45,14 @@ export function RadioPositionDebugger() {
   useEffect(() => {
     if (!dragOffset) return;
     const onMove = (e: PointerEvent) => {
-      setPanelPos({ top: e.clientY - dragOffset.y, left: e.clientX - dragOffset.x });
+      const next = { top: e.clientY - dragOffset.y, left: e.clientX - dragOffset.x };
+      panelPosRef.current = next;
+      setPanelPos(next);
     };
     const onUp = () => {
       setDragOffset(null);
       try {
-        localStorage.setItem(PANEL_POS_KEY, JSON.stringify(panelPos));
+        localStorage.setItem(PANEL_POS_KEY, JSON.stringify(panelPosRef.current));
       } catch {}
     };
     window.addEventListener("pointermove", onMove);
@@ -55,7 +61,7 @@ export function RadioPositionDebugger() {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
     };
-  }, [dragOffset, panelPos]);
+  }, [dragOffset]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -165,7 +171,10 @@ export function RadioPositionDebugger() {
         };
         mode = e.target === handle ? "resize" : "drag";
         el.style.cursor = mode === "resize" ? "nwse-resize" : "grabbing";
-        (e.target as Element).setPointerCapture?.(e.pointerId);
+        // Capture sur l'élément lui-même : il reçoit tous les pointermove/up
+        // suivants même hors de sa zone, ce qui permet d'attacher les handlers
+        // sur `el` plutôt que sur window (évite des listeners globaux par cible).
+        el.setPointerCapture?.(e.pointerId);
         e.preventDefault();
       };
 
@@ -196,13 +205,13 @@ export function RadioPositionDebugger() {
       };
 
       el.addEventListener("pointerdown", onPointerDown);
-      window.addEventListener("pointermove", onPointerMove);
-      window.addEventListener("pointerup", onPointerUp);
+      el.addEventListener("pointermove", onPointerMove);
+      el.addEventListener("pointerup", onPointerUp);
 
       cleanups.push(() => {
         el.removeEventListener("pointerdown", onPointerDown);
-        window.removeEventListener("pointermove", onPointerMove);
-        window.removeEventListener("pointerup", onPointerUp);
+        el.removeEventListener("pointermove", onPointerMove);
+        el.removeEventListener("pointerup", onPointerUp);
         handle.remove();
         el.style.outline = prevOutline;
         el.style.outlineOffset = "";
