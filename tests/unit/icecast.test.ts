@@ -109,9 +109,15 @@ describe("fetchIcecastStatus", () => {
   });
 
   it("returns the parsed status on valid response", async () => {
+    // fetchIcecastStatus lit response.arrayBuffer() (décodage charset avec
+    // fallback windows-1252), pas response.json(). Le mock doit donc fournir
+    // les octets du JSON.
+    const json = JSON.stringify({
+      icestats: { source: { title: "A - B", listeners: 5, bitrate: 128, listener_peak: 10 } }
+    });
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ icestats: { source: { title: "A - B", listeners: 5, bitrate: 128, listener_peak: 10 } } })
+      arrayBuffer: async () => new TextEncoder().encode(json).buffer
     }));
     const result = await fetchIcecastStatus("https://x/status-json.xsl");
     expect(result?.artist).toBe("A");
