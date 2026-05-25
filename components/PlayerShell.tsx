@@ -13,6 +13,7 @@ import { HistoryModal } from "@/components/HistoryModal";
 import { LyricsModal } from "@/components/LyricsModal";
 import { ProgramModal } from "@/components/ProgramModal";
 import { CoverArrivalAnimation } from "@/components/CoverArrivalAnimation";
+import { RadioPositionDebugger } from "@/components/RadioPositionDebugger";
 import type { CoverArt } from "@/lib/types";
 
 interface Props {
@@ -89,6 +90,7 @@ export function PlayerShell({ streamUrl, defaultCoverUrl, initialCover, radioIma
         onOpenProgram={() => setOpenProgram(true)}
       />
       <CoverArrivalAnimation cover={cover} />
+      <RadioPositionDebugger />
       <HistoryModal open={openHistory} onClose={() => setOpenHistory(false)} entries={history.slice(0, 5)} />
       <LyricsModal
         open={openLyrics}
