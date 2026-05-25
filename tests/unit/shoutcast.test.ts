@@ -63,9 +63,12 @@ describe("fetchShoutcastStatus", () => {
   });
 
   it("calls the URL with /7.html and returns parsed result", async () => {
+    // fetchShoutcastStatus lit response.arrayBuffer() (décodage charset avec
+    // fallback windows-1252), pas response.text(). Le mock fournit les octets.
+    const html = "<html><body>1,1,1,1,1,128,Artist - Song</body></html>";
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
-      text: async () => "<html><body>1,1,1,1,1,128,Artist - Song</body></html>"
+      arrayBuffer: async () => new TextEncoder().encode(html).buffer
     });
     vi.stubGlobal("fetch", fetchMock);
     const result = await fetchShoutcastStatus("https://x");
