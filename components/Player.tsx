@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Volume2, VolumeX, Repeat } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { NowPlaying as NowPlayingType } from "@/lib/types";
+import {
+  RADIO_CALIBRATION,
+  RADIO_NATIVE_WIDTH,
+  interpolateRadio
+} from "@/lib/radio-calibration";
 
 interface Props {
   nowPlaying: NowPlayingType | null;
@@ -41,23 +46,45 @@ export function Player({
 
   const cycleRadio = () => setRadioIndex((i) => (i + 1) % radioImages.length);
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // Interpolation de la taille/position de la radio + position du footer à
+  // partir de la table de calibration (lib/radio-calibration.ts). Pilote des
+  // variables CSS sur :root, consommées par #radio-wrapper, #radio-frame et
+  // #page-main dans globals.css. Évite une pile de media queries ingérable.
+  useEffect(() => {
+    const apply = () => {
+      const vw = window.innerWidth;
+      const width = interpolateRadio(RADIO_CALIBRATION, vw, "width");
+      const top = interpolateRadio(RADIO_CALIBRATION, vw, "top");
+      const right = interpolateRadio(RADIO_CALIBRATION, vw, "right");
+      const footerTop = interpolateRadio(RADIO_CALIBRATION, vw, "footerTop");
+      const header = document.getElementById("site-header");
+      const headerH = header ? header.offsetHeight : 199;
+      const root = document.documentElement.style;
+      root.setProperty("--radio-width", `${width}px`);
+      root.setProperty("--radio-top", `${top}px`);
+      root.setProperty("--radio-right", `${right}px`);
+      root.setProperty("--radio-scale", String(width / RADIO_NATIVE_WIDTH));
+      root.setProperty("--page-main-minh", `${Math.max(0, footerTop - headerH)}px`);
+    };
+    apply();
+    window.addEventListener("resize", apply);
+    return () => window.removeEventListener("resize", apply);
+  }, []);
+
   return (
     <section
       id="player-section"
       className="hidden lg:flex lg:justify-center"
       style={{ marginBottom: "4px" }}
     >
-      {/* Conteneur de l'image radio — rotation toutes les 15s, ratio 673x475, décalée de 150px à droite */}
+      {/* Wrapper auto-proportionnel : taille responsive + container-query (CSS dans globals.css) */}
+      <div id="radio-wrapper" ref={wrapperRef}>
+      {/* Conteneur intrinsèque 673×475, scalé par le wrapper via transform */}
       <div
         id="radio-frame"
         className="relative"
-        style={{
-          width: "673px",
-          height: "475px",
-          maxWidth: "100%",
-          flexShrink: 0,
-          transform: "translateX(150px)"
-        }}
       >
         {/* Couche image — sans filter ni effet de bord */}
         <div
@@ -242,6 +269,7 @@ export function Player({
             ))}
           </div>
         </div>
+      </div>
       </div>
     </section>
   );

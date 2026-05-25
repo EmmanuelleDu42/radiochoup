@@ -170,6 +170,12 @@ input[type="range"]::-ms-thumb {
   background: url('/img/background_menu_bas.png') no-repeat top center, #cd7784;
   padding: 26px 32px 16px;
   font-family: Arial, sans-serif;
+  /* Passe au-dessus du contenu de #page-main (radio absolue) dans la bande
+     de chevauchement : sinon la boîte de la radio — transparente en bas mais
+     présente — recouvre le haut des cartes footer et bloque leurs clics.
+     position:relative + z-index positif l'emporte sur #page-main (z:auto). */
+  position: relative;
+  z-index: 1;
 }
 
 .footer-widgets {
@@ -294,6 +300,74 @@ input[type="range"]::-ms-thumb {
   .footer-card__image .ftc-img,
   .footer-card__image img {
     max-height: 100px;
+  }
+}
+
+/* ============================================================
+   #page-main min-height : pousse le footer (en flow) à la hauteur
+   voulue par le user. La valeur --page-main-minh est interpolée en JS
+   (Player.tsx) depuis la table de calibration. Fallback = valeur @1034
+   avant hydratation. */
+#page-main {
+  min-height: var(--page-main-minh, 292px);
+}
+
+/* ============================================================
+   #radio-wrapper : la radio devient un bloc auto-proportionnel.
+   Taille + position (width/top/right) interpolées en JS par segments
+   depuis lib/radio-calibration.ts et exposées en variables CSS sur :root.
+   Fallbacks = valeurs du plus petit viewport calibré (1034) pour le rendu
+   avant hydratation. Le #radio-frame interne (673×475) est scalé par
+   --radio-scale (= width courante / 673), aussi calculé en JS.
+   ============================================================ */
+#radio-wrapper {
+  width: var(--radio-width, 566px);
+  aspect-ratio: 673 / 475;
+  container-type: inline-size;
+  position: absolute;
+  top: var(--radio-top, -77px);
+  right: var(--radio-right, 53px);
+}
+
+#radio-wrapper #radio-frame {
+  /* La frame est sortie du flow du wrapper (position absolute) pour que
+     le wrapper conserve sa hauteur dérivée d'aspect-ratio. Sinon la frame
+     en width/height 673x475 native pousse la hauteur du wrapper à 475px
+     et crée un trou vertical sous la radio. */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 673px;
+  height: 475px;
+  transform-origin: top left;
+  /* --radio-scale est calculé en JS (Player.tsx) = largeur interpolée / 673.
+     Solution requise car CSS pur ne peut pas diviser deux longueurs pour
+     produire un nombre dans transform:scale. Fallback 0.841 = 566/673
+     (valeur @1034) pour le rendu avant hydratation. */
+  transform: scale(var(--radio-scale, 0.841));
+}
+
+/* ============================================================
+   Footer compact sur petits écrans desktop (Dell 13" etc.)
+   La radio scale toute seule maintenant — pas de règles ici.
+   ============================================================ */
+@media (min-width: 1024px) and (max-height: 720px) {
+  .site-footer {
+    padding: 14px 32px 10px !important;
+  }
+  .footer-card {
+    min-height: 110px !important;
+  }
+  .footer-card__image .ftc-img,
+  .footer-card__image img {
+    max-height: 90px !important;
+  }
+  .footer-card--full .footer-card__image .ftc-img,
+  .footer-card--full .footer-card__image img {
+    max-height: 100px !important;
+  }
+  .footer-credits {
+    margin-top: 12px !important;
   }
 }
 
