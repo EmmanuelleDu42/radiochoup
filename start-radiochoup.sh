@@ -26,8 +26,19 @@ LOG_FILE="logs/startup.log"
 # Ports à surveiller et libérer (série 35xx réservée à Radio Choup)
 REQUIRED_PORTS=($DEFAULT_PORT 3501 3502)
 
-# PIDs des sous-processus lancés
+# Répertoire absolu du projet : sert à cibler précisément les process à tuer,
+# sans toucher aux serveurs Node/Next d'autres projets de la machine.
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Groupe de processus du script lui-même : garde-fou pour ne jamais se tuer
+# soi-même lors du nettoyage par groupe (voir register_pgid / cleanup).
+SCRIPT_PGID=$(ps -o pgid= -p $$ 2>/dev/null | tr -d ' ')
+
+# PIDs des launchers lancés + leurs PGID (groupes de processus complets :
+# pnpm -> next -> workers), pour un arrêt total au Ctrl+C.
 CHILD_PIDS=()
+CHILD_PGIDS=()
+LAST_LAUNCH_PID=""
 
 # =============================================================================
 # FONCTIONS UTILITAIRES
@@ -131,28 +142,101 @@ kill_ports() {
 }
 
 force_kill_node_processes() {
-  log "INFO" "Nettoyage complet des processus Node.js/pnpm..."
+  log "INFO" "Nettoyage des processus Node.js/pnpm de ce projet..."
 
-  pkill -f "pnpm dev" 2>/dev/null || true
-  pkill -f "pnpm start" 2>/dev/null || true
-  pkill -f "next dev" 2>/dev/null || true
-  pkill -f "next start" 2>/dev/null || true
-  pkill -f "node.*next" 2>/dev/null || true
+  # On NE cible QUE les process dont la ligne de commande référence le
+  # répertoire du projet (binaires lancés depuis ./node_modules), pour ne
+  # jamais tuer les serveurs Node/Next d'autres projets de la machine.
+  # `pkill -f` matche en regex étendue (ERE) : on échappe donc PROJECT_DIR
+  # pour qu'un chemin de checkout contenant un métacaractère (+, (), [], etc.)
+  # reste interprété littéralement. Seul le suffixe `.*next` / `.*\.bin` garde
+  # son rôle de wildcard intentionnel.
+  local proj_re
+  proj_re=$(printf '%s' "$PROJECT_DIR" | sed -E 's/[][(){}.^$*+?|\\]/\\&/g')
+  pkill -f "${proj_re}/node_modules/.*next" 2>/dev/null || true
+  pkill -f "${proj_re}/node_modules/.*\.bin" 2>/dev/null || true
 
   sleep 1
 
   log "SUCCESS" "Nettoyage des processus Node.js terminé"
 }
 
+# Enregistre le PGID (groupe de processus) du launcher passé en argument, afin
+# de pouvoir tuer tout l'arbre (pnpm -> next -> workers) d'un seul kill.
+# Garde-fou : ne jamais enregistrer le groupe du script lui-même.
+register_pgid() {
+  local pid=$1
+  local pgid
+  pgid=$(ps -o pgid= -p "$pid" 2>/dev/null | tr -d ' ')
+  [ -z "$pgid" ] && pgid="$pid"
+  if [ "$pgid" = "$$" ] || { [ -n "$SCRIPT_PGID" ] && [ "$pgid" = "$SCRIPT_PGID" ]; }; then
+    log "WARN" "Groupe de processus serveur confondu avec celui du script : repli sur le PID seul"
+    return
+  fi
+  CHILD_PGIDS+=("$pgid")
+}
+
+# Lance une commande serveur en arrière-plan dans son PROPRE groupe de
+# processus (via setsid) quand c'est possible, et enregistre PID + PGID pour
+# un arrêt complet au Ctrl+C. $1 = commande shell complète (pipeline inclus).
+# Le PID du launcher est exposé via LAST_LAUNCH_PID.
+#
+# Limite connue (mode dégradé sans setsid, ex. macOS) : le launcher hérite du
+# groupe du script, donc register_pgid se replie sur le PID seul et l'arrêt par
+# groupe ne s'applique pas. L'arbre pnpm -> next -> workers est alors nettoyé
+# par les filets de cleanup (force_kill_node_processes projet-scoped + ports).
+launch_in_group() {
+  local cmd=$1
+  if command -v setsid &> /dev/null; then
+    setsid bash -c "$cmd" &
+  else
+    log "WARN" "setsid indisponible : arrêt par groupe de processus dégradé (filets de sécurité actifs)"
+    bash -c "$cmd" &
+  fi
+  local pid=$!
+  LAST_LAUNCH_PID=$pid
+  CHILD_PIDS+=("$pid")
+  register_pgid "$pid"
+}
+
 cleanup() {
+  # Neutralise les signaux pendant le nettoyage (évite qu'un double Ctrl+C
+  # relance cleanup en plein milieu).
+  trap '' SIGINT SIGTERM
   echo ""
-  log "WARN" "Arrêt demandé, nettoyage..."
-  for pid in "${CHILD_PIDS[@]}"; do
-    if kill -0 "$pid" 2>/dev/null; then
-      kill -9 "$pid" 2>/dev/null || true
+  log "WARN" "Arrêt demandé, nettoyage complet en cours..."
+
+  # 1) Arrêt GRACIEUX de chaque groupe de processus complet (serveur + tous
+  #    ses enfants/workers : pnpm -> next -> workers de compilation).
+  for pgid in "${CHILD_PGIDS[@]}"; do
+    [ -z "$pgid" ] && continue
+    if kill -0 "-$pgid" 2>/dev/null; then
+      kill -TERM "-$pgid" 2>/dev/null || true
     fi
   done
+
+  # Fenêtre courte pour laisser Next fermer proprement le serveur.
+  sleep 2
+
+  # 2) Arrêt FORCÉ des groupes encore vivants.
+  for pgid in "${CHILD_PGIDS[@]}"; do
+    [ -z "$pgid" ] && continue
+    if kill -0 "-$pgid" 2>/dev/null; then
+      kill -KILL "-$pgid" 2>/dev/null || true
+    fi
+  done
+
+  # 3) Filet de sécurité : PIDs directs des launchers (mode dégradé sans setsid).
+  for pid in "${CHILD_PIDS[@]}"; do
+    kill -KILL "$pid" 2>/dev/null || true
+  done
+
+  # 4) Filet de sécurité ciblé sur les process Node de CE projet uniquement.
+  force_kill_node_processes
+
+  # 5) Libération explicite des ports réservés à Radio Choup.
   kill_ports "${REQUIRED_PORTS[@]}"
+
   log "SUCCESS" "Tous les services ont été arrêtés et les ports libérés."
   exit 0
 }
@@ -343,9 +427,10 @@ start_dev() {
   fi
 
   log "INFO" "Démarrage du serveur de développement sur le port $DEFAULT_PORT"
-  pnpm dev 2>&1 | tee logs/dev.log | grep --line-buffered -E '(ERROR|Error|error|500|404|401|403|WARN|warn|✗|failed|crash|Erreur)' &
-  DEV_PID=$!
-  CHILD_PIDS+=($DEV_PID)
+  # Lancé dans son propre groupe de processus pour pouvoir tout arrêter au Ctrl+C.
+  local log_filter='(ERROR|Error|error|500|404|401|403|WARN|warn|✗|failed|crash|Erreur)'
+  launch_in_group "pnpm dev 2>&1 | tee logs/dev.log | grep --line-buffered -E '$log_filter'"
+  DEV_PID=$LAST_LAUNCH_PID
 
   sleep 3
 
@@ -370,9 +455,10 @@ start_prod() {
   fi
 
   log "INFO" "Démarrage du serveur de production sur le port $DEFAULT_PORT"
-  pnpm start 2>&1 | tee logs/prod.log | grep --line-buffered -E '(ERROR|Error|error|500|404|401|403|WARN|warn|✗|failed|crash|Erreur)' &
-  PROD_PID=$!
-  CHILD_PIDS+=($PROD_PID)
+  # Lancé dans son propre groupe de processus pour pouvoir tout arrêter au Ctrl+C.
+  local log_filter='(ERROR|Error|error|500|404|401|403|WARN|warn|✗|failed|crash|Erreur)'
+  launch_in_group "pnpm start 2>&1 | tee logs/prod.log | grep --line-buffered -E '$log_filter'"
+  PROD_PID=$LAST_LAUNCH_PID
 
   sleep 3
 
