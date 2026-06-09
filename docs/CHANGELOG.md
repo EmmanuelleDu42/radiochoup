@@ -4,6 +4,13 @@ Format : [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/).
 
 ## [Unreleased]
 
+### Paroles
+
+- **Added** : fallback **lrclib.net** (gratuit, sans clé) quand Vagalume ne
+  renvoie rien. Orchestrateur `lib/lyrics.ts` (Vagalume puis lrclib).
+- **Fixed** : la fonctionnalité Paroles ne remontait plus rien depuis que
+  l'API publique Vagalume renvoie 503 sur tous ses endpoints.
+
 ### Refonte complète (Next.js)
 
 - **Added** : Next.js 15 App Router, React 19, TypeScript, Tailwind v4
