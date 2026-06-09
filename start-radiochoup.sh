@@ -147,8 +147,14 @@ force_kill_node_processes() {
   # On NE cible QUE les process dont la ligne de commande référence le
   # répertoire du projet (binaires lancés depuis ./node_modules), pour ne
   # jamais tuer les serveurs Node/Next d'autres projets de la machine.
-  pkill -f "${PROJECT_DIR}/node_modules/.*next" 2>/dev/null || true
-  pkill -f "${PROJECT_DIR}/node_modules/.*\.bin" 2>/dev/null || true
+  # `pkill -f` matche en regex étendue (ERE) : on échappe donc PROJECT_DIR
+  # pour qu'un chemin de checkout contenant un métacaractère (+, (), [], etc.)
+  # reste interprété littéralement. Seul le suffixe `.*next` / `.*\.bin` garde
+  # son rôle de wildcard intentionnel.
+  local proj_re
+  proj_re=$(printf '%s' "$PROJECT_DIR" | sed -E 's/[][(){}.^$*+?|\\]/\\&/g')
+  pkill -f "${proj_re}/node_modules/.*next" 2>/dev/null || true
+  pkill -f "${proj_re}/node_modules/.*\.bin" 2>/dev/null || true
 
   sleep 1
 
@@ -174,6 +180,11 @@ register_pgid() {
 # processus (via setsid) quand c'est possible, et enregistre PID + PGID pour
 # un arrêt complet au Ctrl+C. $1 = commande shell complète (pipeline inclus).
 # Le PID du launcher est exposé via LAST_LAUNCH_PID.
+#
+# Limite connue (mode dégradé sans setsid, ex. macOS) : le launcher hérite du
+# groupe du script, donc register_pgid se replie sur le PID seul et l'arrêt par
+# groupe ne s'applique pas. L'arbre pnpm -> next -> workers est alors nettoyé
+# par les filets de cleanup (force_kill_node_processes projet-scoped + ports).
 launch_in_group() {
   local cmd=$1
   if command -v setsid &> /dev/null; then
