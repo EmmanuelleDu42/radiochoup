@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import fs from "node:fs";
 import path from "node:path";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { PromoBar } from "@/components/PromoBar";
 import { PlayerShell } from "@/components/PlayerShell";
 import { CoverAnimationProvider } from "@/lib/cover-animation-context";
@@ -55,7 +54,6 @@ export default async function HomePage() {
         />
       </main>
       <PromoBar />
-      <Footer />
     </CoverAnimationProvider>
   );
 }
