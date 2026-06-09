@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchLyrics } from "@/lib/vagalume";
+import { getLyrics } from "@/lib/lyrics";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -11,6 +11,6 @@ export async function GET(request: Request) {
   if (!artist || !song) {
     return NextResponse.json({ error: "artist and song are required" }, { status: 400 });
   }
-  const lyrics = await fetchLyrics({ artist, song });
+  const lyrics = await getLyrics({ artist, song });
   return NextResponse.json(lyrics);
 }
