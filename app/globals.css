@@ -276,6 +276,15 @@ input[type="range"]::-ms-thumb {
   font-weight: 600;
 }
 
+.footer-credits__link {
+  color: #fff;
+  text-decoration: none;
+}
+
+.footer-credits__link:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 900px) {
   .footer-widgets {
     grid-template-columns: 1fr;

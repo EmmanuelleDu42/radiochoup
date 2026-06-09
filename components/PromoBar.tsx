@@ -55,7 +55,15 @@ export function PromoBar() {
       </div>
 
       <div className="footer-credits">
-        Webdesign MP Pastini, Développement Cef i, Radio Choup, tous droits réservés
+        <a
+          href="https://www.mariepierrepastini.fr/"
+          rel="external noreferrer"
+          target="_blank"
+          className="footer-credits__link"
+        >
+          Webdesign MP Pastini
+        </a>
+        , Développement Cef-i, Radio Choup, tous droits réservés
       </div>
     </footer>
   );
