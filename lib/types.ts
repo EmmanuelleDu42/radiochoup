@@ -16,7 +16,7 @@ export interface HistoryEntry {
 
 export interface Lyrics {
   text: string | null;
-  source: "vagalume" | null;
+  source: "vagalume" | "lrclib" | null;
   available: boolean;
 }
 

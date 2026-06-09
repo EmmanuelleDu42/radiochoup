@@ -34,12 +34,17 @@ Retourne les N derniers morceaux distincts joués (max 20, défaut 5).
 
 ## GET /api/lyrics?artist=X&song=Y
 
-Récupère les paroles via Vagalume (cachées 7 jours côté serveur).
+Récupère les paroles via une chaîne de fallback : **Vagalume** d'abord, puis
+**lrclib.net** si Vagalume ne renvoie rien (son API publique renvoie 503 depuis
+mi-2026). Résultat caché 7 jours côté serveur (`LYRICS_CACHE_TTL_S`).
 
 **200 OK**
 ```json
 { "text": "...", "source": "vagalume", "available": true }
 ```
+
+`source` vaut `"vagalume"`, `"lrclib"`, ou `null` quand aucune parole n'est
+trouvée (`available: false`, `text: null`).
 
 **400 Bad Request** : paramètres manquants.
 
